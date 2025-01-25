@@ -3,6 +3,7 @@ package com.example.backendweb.Entity.Recommendation;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -39,7 +40,7 @@ public class Recommendation {
     private Integer contentId; // 推荐内容ID (外键，关联 RecommendationContent)
 
     @Column(nullable = false, precision = 5, scale = 2)
-    private Double score; // 推荐分数 (算法生成)
+    private BigDecimal score; // 推荐分数 (算法生成)
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime generatedAt; // 推荐生成时间

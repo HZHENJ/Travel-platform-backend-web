@@ -3,6 +3,7 @@ package com.example.backendweb.Entity.Recommendation;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -33,7 +34,7 @@ public class RecommendationContent {
     private Integer referenceId; // 引用基础信息表的 ID (HotelInfo 或 AttractionInfo)
 
     @Column(nullable = false, precision = 5, scale = 2)
-    private Double score; // 推荐分数 (算法生成)
+    private BigDecimal score; // 推荐分数 (算法生成)
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt; // 创建时间
