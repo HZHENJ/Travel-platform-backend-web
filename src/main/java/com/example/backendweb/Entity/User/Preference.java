@@ -1,4 +1,4 @@
-package com.example.backendweb.entity.user;
+package com.example.backendweb.Entity.User;
 
 import jakarta.persistence.*;
 import lombok.*;

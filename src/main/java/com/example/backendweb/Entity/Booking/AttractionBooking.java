@@ -1,4 +1,4 @@
-package com.example.backendweb.entity.booking;
+package com.example.backendweb.Entity.Booking;
 
 import jakarta.persistence.*;
 import lombok.*;

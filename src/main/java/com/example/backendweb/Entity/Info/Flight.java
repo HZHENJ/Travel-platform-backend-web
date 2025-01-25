@@ -1,4 +1,4 @@
-package com.example.backendweb.entity.info;
+package com.example.backendweb.Entity.Info;
 
 import jakarta.persistence.*;
 import lombok.*;

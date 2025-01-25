@@ -1,13 +1,12 @@
-package com.example.backendweb.entity.booking;
+package com.example.backendweb.Entity.Review;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * @ClassName Booking
+ * @ClassName Review
  * @Description
  * @Author HUANG ZHENJIA
  * @StudentID A0298312B
@@ -16,32 +15,35 @@ import java.time.LocalDateTime;
  */
 
 @Entity
-@Table(name = "bookings")
+@Table(name = "reviews")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Booking {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer bookingId; // 预订唯一标识 (Primary Key)
+    private Integer reviewId; // 评论唯一标识 (Primary Key)
 
     @Column(nullable = false)
     private Integer userId; // 用户ID (外键)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingType bookingType; // 预订类型 (航班、酒店或景点)
+    private ItemType itemType; // 评价对象类型 (航班、酒店或景点)
+
+    @Column(nullable = false)
+    private Integer itemId; // 评价对象ID (如航班ID、酒店ID、景点ID)
+
+    @Column(nullable = false, precision = 2, scale = 1)
+    private Double rating; // 评分
+
+    @Column(columnDefinition = "TEXT")
+    private String comment; // 评论内容
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status; // 预订状态
-
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAmount; // 总金额
-
-    // @Column(nullable = true)
-    // private Integer paymentId; // 支付ID (外键)
+    private ReviewStatus status; // 评论状态 (显示或隐藏)
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt; // 创建时间
@@ -49,11 +51,12 @@ public class Booking {
     @Column(nullable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt; // 更新时间
 
-    public enum BookingType {
+    public enum ItemType {
         Flight, Hotel, Attraction
     }
 
-    public enum BookingStatus {
-        Confirmed, Canceled, Pending
+    public enum ReviewStatus {
+        隐藏, 显示
     }
+
 }

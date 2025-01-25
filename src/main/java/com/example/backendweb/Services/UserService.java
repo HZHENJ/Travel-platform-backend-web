@@ -4,10 +4,10 @@ package com.example.backendweb.Services;
 import com.example.backendweb.Repository.AuthenticationRepository;
 import com.example.backendweb.Repository.PreferenceRepository;
 import com.example.backendweb.Repository.UserRepository;
-import com.example.backendweb.entity.Exception.CustomException;
-import com.example.backendweb.entity.user.Authentication;
-import com.example.backendweb.entity.user.Preference;
-import com.example.backendweb.entity.user.User;
+import com.example.backendweb.Entity.Exception.CustomException;
+import com.example.backendweb.Entity.User.Authentication;
+import com.example.backendweb.Entity.User.Preference;
+import com.example.backendweb.Entity.User.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
