@@ -1,4 +1,4 @@
-package com.example.backendweb.entity.Exception;
+package com.example.backendweb.Entity.Exception;
 
 public class CustomException extends RuntimeException {
     private String message;
