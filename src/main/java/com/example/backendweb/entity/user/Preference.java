@@ -3,6 +3,7 @@ package com.example.backendweb.entity.user;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -36,7 +37,7 @@ public class Preference {
     private TravelType travelType = TravelType.Single; // 旅行类型 (默认 Single)
 
     @Column(precision = 10, scale = 2)
-    private Double budgetRange; // 预算范围
+    private BigDecimal budgetRange; // 预算范围
 
     @Column(nullable = false, length = 50)
     private String language = "en"; // 语言 (默认 en)
