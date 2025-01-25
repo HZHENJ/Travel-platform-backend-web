@@ -3,6 +3,8 @@ package com.example.backendweb.Entity.Review;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * @ClassName ReviewStats
  * @Description
@@ -35,7 +37,7 @@ public class ReviewStats {
     private Integer totalReviews; // 总评论数
 
     @Column(nullable = false, precision = 2, scale = 1)
-    private Double averageRating; // 平均评分
+    private BigDecimal averageRating; // 平均评分
 
     public enum ItemType {
         Hotel, Attraction

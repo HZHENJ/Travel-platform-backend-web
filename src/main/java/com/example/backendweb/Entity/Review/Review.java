@@ -3,6 +3,7 @@ package com.example.backendweb.Entity.Review;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -36,7 +37,7 @@ public class Review {
     private Integer itemId; // 评价对象ID (如航班ID、酒店ID、景点ID)
 
     @Column(nullable = false, precision = 2, scale = 1)
-    private Double rating; // 评分
+    private BigDecimal rating; // 评分
 
     @Column(columnDefinition = "TEXT")
     private String comment; // 评论内容
