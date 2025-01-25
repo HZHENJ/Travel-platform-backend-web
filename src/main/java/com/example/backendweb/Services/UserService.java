@@ -28,33 +28,43 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public void RetriveData(Authentication auth, User user, Preference pre){
-        registerUser(user);
-        registerAuthentication(auth,user);
-        registerPreference(pre,user);
+    public User Login(String Username,String Password){
+        Optional<Authentication> data = authenticationRepository.findByUsername(Username);
+        if(data.isPresent() && data.get().getPasswordHash().equals(Password)){
+            return data.get().getUser();
+        }else{
+            throw new CustomException("User not exist or Wrong password",400);
+        }
     }
 
-    public void registerUser(User user){
+    public boolean RetriveData(Authentication auth, User user, Preference pre){
+        return registerUser(user) && registerAuthentication(auth,user) && registerPreference(pre,user);
+    }
+
+    public boolean registerUser(User user){
         if(user == null) throw new CustomException("Empty Data",400);
         Optional<User> existingUser = userRepository.findById(user.getUserId());
         if(existingUser.isPresent()) throw new CustomException("User already exits",409);
         userRepository.save(user);
+        return true;
     }
 
-    public void registerAuthentication(Authentication auth,User user){
-        if(auth == null && user == null) throw new CustomException("Empty Data",400);
+    public boolean registerAuthentication(Authentication auth,User user){
+        if(auth == null || user == null) throw new CustomException("Empty Data",400);
         Optional<Authentication> existingAuth = authenticationRepository.findById(auth.getAuthId());
         if(existingAuth.isPresent()) throw new CustomException("User already exits",409);
         auth.setPasswordHash(bCryptPasswordEncoder.encode(auth.getPasswordHash()));
         auth.setUser(user);
         authenticationRepository.save(auth);
+        return true;
     }
 
-    public void registerPreference(Preference pre,User user){
-        if(pre == null && user == null) throw new CustomException("Empty Data",400);
+    public boolean registerPreference(Preference pre,User user){
+        if(pre == null || user == null) throw new CustomException("Empty Data",400);
         Optional<Authentication> existingPre = authenticationRepository.findById(pre.getPreferenceId());
         if(existingPre.isPresent()) throw new CustomException("User already exits",409);
         pre.setUser(user);
         preferenceRepository.save(pre);
+        return true;
     }
 }
