@@ -3,6 +3,7 @@ package com.example.backendweb.entity.booking;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -37,7 +38,7 @@ public class Booking {
     private BookingStatus status; // 预订状态
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private Double totalAmount; // 总金额
+    private BigDecimal totalAmount; // 总金额
 
     // @Column(nullable = true)
     // private Integer paymentId; // 支付ID (外键)
