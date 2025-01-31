@@ -26,7 +26,10 @@ public class Attraction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer attractionId; // 景点唯一标识
+    private Integer attractionId;
+
+    @Column(nullable = false, unique = true)
+    private String uuid; // 景点唯一标识
 
     @Column(nullable = false, length = 255)
     private String attractionName; // 景点名称
@@ -39,7 +42,7 @@ public class Attraction {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json", nullable = false)
-    private Map<String, Double> ticketType; // 门票类型及价格
+    private Map<String, String> ticketType; // 门票类型及价格
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json", nullable = false)
