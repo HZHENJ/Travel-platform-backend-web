@@ -25,7 +25,7 @@ public class CorsConfig {
                 // 对所有路径生效
                 registry.addMapping("/**")
                         // 允许所有来源，如果你只允许特定域名，请替换为对应域名，例如 "http://example.com"
-                        .allowedOrigins("*")
+                        .allowedOrigins("http://localhost:5173")
                         // 允许的请求方法
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         // 允许的请求头
