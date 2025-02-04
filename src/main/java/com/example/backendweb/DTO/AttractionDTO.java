@@ -1,4 +1,4 @@
-package com.example.backendweb.dto;
+package com.example.backendweb.DTO;
 
 import lombok.Data;
 

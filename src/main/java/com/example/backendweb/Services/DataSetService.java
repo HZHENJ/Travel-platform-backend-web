@@ -1,6 +1,6 @@
 package com.example.backendweb.Services;
 
-import com.example.backendweb.dto.AttractionDTO;
+import com.example.backendweb.DTO.AttractionDTO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.stereotype.Service;

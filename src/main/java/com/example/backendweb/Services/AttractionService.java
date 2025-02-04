@@ -1,7 +1,7 @@
 package com.example.backendweb.Services;
 
 import com.example.backendweb.Entity.Info.Attraction;
-import com.example.backendweb.dto.AttractionDTO;
+import com.example.backendweb.DTO.AttractionDTO;
 import com.example.backendweb.Repository.AttractionRepository;
 import org.springframework.stereotype.Service;
 
