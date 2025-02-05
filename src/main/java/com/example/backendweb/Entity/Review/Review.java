@@ -31,7 +31,7 @@ public class Review {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ItemType itemType; // 评价对象类型 (航班、酒店或景点)
+    private ItemType itemType; // 评价对象类型 (酒店或景点)
 
     @Column(nullable = false)
     private Integer itemId; // 评价对象ID (如航班ID、酒店ID、景点ID)
@@ -57,7 +57,7 @@ public class Review {
     }
 
     public enum ReviewStatus {
-        隐藏, 显示
+        hide, show
     }
 
 }
