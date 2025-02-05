@@ -27,7 +27,7 @@ public class SimilarityService {
 
 
     // Calculate the similarity between two users (based on cosine similarity)
-    public double calculateSimilarity(Integer userId1, Integer userId2) {
+    public double calculateUserSimilarity(Integer userId1, Integer userId2) {
 
         // Get the rating data of two users
         List<Review> user1Reviews = reviewRepository.findByUserId(userId1);

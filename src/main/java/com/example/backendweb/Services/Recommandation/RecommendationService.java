@@ -41,7 +41,9 @@ public class RecommendationService {
     @Autowired
     private SimilarityService similarityService;
 
-    // Get popular attractions (based on average ratings)
+    /**
+    * Get popular attractions (based on average ratings)
+    */
     public List<Attraction> getPopularAttractions() {
         List<ReviewStats> topAttractions = reviewStatsRepository.findByItemTypeOrderByAverageRatingDesc(ReviewStats.ItemType.Attraction);
         return topAttractions.stream()
@@ -51,14 +53,16 @@ public class RecommendationService {
                 .collect(Collectors.toList());
     }
 
-    // Calculate user personalized recommendations (based on similar users)
+    /**
+     * Calculate user personalized recommendations (based on similar users)
+     */
     public List<Attraction> getPersonalizedRecommendations(Integer userId) {
         List<User> allUsers = userRepository.findAll();
         Map<Integer, Double> similarityScores = new HashMap<>();
 
         for (User user : allUsers) {
             if (!user.getUserId().equals(userId)) {
-                double similarity = similarityService.calculateSimilarity(userId, user.getUserId());
+                double similarity = similarityService.calculateUserSimilarity(userId, user.getUserId());
                 similarityScores.put(user.getUserId(), similarity);
             }
         }
@@ -95,7 +99,9 @@ public class RecommendationService {
                 .collect(Collectors.toList());
     }
 
-    // Comprehensive recommendations (combine popular and personalized recommendations)
+    /**
+     * Comprehensive recommendations (combine popular and personalized recommendations)
+     */
     public List<Attraction> getCombinedRecommendations(Integer userId) {
         List<Attraction> popular = getPopularAttractions();
         List<Attraction> personalized = getPersonalizedRecommendations(userId);
