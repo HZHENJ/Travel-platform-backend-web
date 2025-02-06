@@ -62,15 +62,22 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(@RequestBody UserLoginRequest request) {
-        User user = userService.login(request.getUsername(), request.getPassword());
+        User user = userService.login(request.getEmail(), request.getPassword());
 
         // 通过 `UserService` 获取 `Authentication` 记录
-        Authentication auth = userService.getUserAuthentication(request.getUsername());
+        Authentication auth = userService.getUserAuthentication(user);
 
         // 生成 JWT 令牌
         String token = jwtUtil.generateToken(user.getUserId(), auth.getRole());
 
-        return ResponseEntity.ok(new LoginResponse(token, user.getUserId(), user.getName(), user.getEmail(), auth.getRole().name()));
+        return ResponseEntity.ok(
+                new LoginResponse(
+                        token,
+                        user.getUserId(),
+                        user.getName(),
+                        user.getEmail(),
+                        auth.getRole().name()
+                ));
     }
 
 }

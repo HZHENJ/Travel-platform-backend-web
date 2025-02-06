@@ -29,13 +29,26 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User login(String username, String password){
-        Optional<Authentication> data = authenticationRepository.findByUsername(username);
-        if (data.isPresent() && bCryptPasswordEncoder.matches(password, data.get().getPasswordHash())){
-            return data.get().getUser();
-        }else{
-            throw new CustomException("User not exist or Wrong password",400);
+    public User login(String email, String password) {
+        // find user by email
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            throw new CustomException("User not found", 404);
         }
+        User user = userOpt.get();
+
+        // find auth by user
+        Optional<Authentication> authOpt = authenticationRepository.findByUser(user);
+        if (authOpt.isEmpty()) {
+            throw new CustomException("User not found", 404);
+        }
+        Authentication auth = authOpt.get();
+
+        if (!bCryptPasswordEncoder.matches(password, auth.getPasswordHash())) {
+            throw new CustomException("Invalid password", 401);
+        }
+
+        return auth.getUser();
     }
 
     @Transactional
@@ -93,10 +106,10 @@ public class UserService {
     }
 
     /**
-     * 根据用户名获取 `Authentication` 记录
+     * 根据username获取 `Authentication` 记录
      */
-    public Authentication getUserAuthentication(String username) {
-        return authenticationRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException("Authentication record not found for user: " + username, 500));
+    public Authentication getUserAuthentication(User user) {
+        return authenticationRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException("User authentication not found", 404));
     }
 }
