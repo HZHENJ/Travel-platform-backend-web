@@ -27,7 +27,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId; // 用户唯一标识 (Primary Key)
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String name; // 用户名
 
     @Column(nullable = false, unique = true, length = 255)
@@ -36,7 +36,7 @@ public class User {
     @Temporal(TemporalType.DATE)
     private Date dateOfBirth; // 用户出生日期（可选）
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private Gender gender; // 用户性别
 
@@ -47,8 +47,8 @@ public class User {
     private LocalDateTime updatedAt; // 更新时间
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'Active'")
-    private Status status; // 用户状态（Active/Inactive）
+    @Column(nullable = false)
+    private Status status = Status.Active; // 用户状态默认为Status.Active
 
     @Column(nullable = false, length = 100)
     private String country; // 用户所在国家
