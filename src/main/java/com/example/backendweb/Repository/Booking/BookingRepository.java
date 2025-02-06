@@ -1,4 +1,4 @@
-package com.example.backendweb.Repository;
+package com.example.backendweb.Repository.Booking;
 
 import com.example.backendweb.Entity.Booking.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
