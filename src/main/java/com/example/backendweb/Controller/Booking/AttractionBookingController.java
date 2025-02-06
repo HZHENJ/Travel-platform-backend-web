@@ -4,10 +4,9 @@ import com.example.backendweb.DTO.AttractionBookingRequest;
 import com.example.backendweb.Entity.Booking.AttractionBooking;
 import com.example.backendweb.Services.BookingService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @ClassName BookingAttractionController
@@ -39,6 +38,12 @@ public class AttractionBookingController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage()); // 400 错误
         }
+    }
+
+    @GetMapping("/bookings/{userId}")
+    public ResponseEntity<List<AttractionBooking>> getAttractionBookingsByUser(@PathVariable Integer userId) {
+        List<AttractionBooking> attractionBookings = bookingService.getAttractionBookingsByUserId(userId);
+        return ResponseEntity.ok(attractionBookings);
     }
 
 }

@@ -4,6 +4,8 @@ import com.example.backendweb.Entity.Booking.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @ClassName BookingRepository
  * @Description
@@ -14,5 +16,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
-
+    List<Booking> findByUserId(Integer userId);
 }

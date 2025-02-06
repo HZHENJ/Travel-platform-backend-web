@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName BookingService
@@ -26,14 +28,32 @@ import java.util.Map;
 @Service
 public class BookingService {
 
-    @Autowired
-    private BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository;
+    private final AttractionBookingRepository attractionBookingRepository;
 
-    @Autowired
-    private AttractionBookingRepository attractionBookingRepository;
+    private final AttractionRepository attractionRepository;
 
-    @Autowired
-    private AttractionRepository attractionRepository;
+    public BookingService(BookingRepository bookingRepository,
+                          AttractionBookingRepository attractionBookingRepository,
+                          AttractionRepository attractionRepository
+    ) {
+        this.bookingRepository = bookingRepository;
+        this.attractionBookingRepository = attractionBookingRepository;
+        this.attractionRepository = attractionRepository;
+    }
+
+    public List<AttractionBooking> getAttractionBookingsByUserId(Integer userId) {
+        // 1. 查询该用户的所有 Booking
+        List<Booking> userBookings = bookingRepository.findByUserId(userId);
+
+        // 2. 提取 bookingId
+        List<Integer> bookingIds = userBookings.stream()
+                .map(Booking::getBookingId)
+                .collect(Collectors.toList());
+
+        // 3. 查询所有景点预订
+        return attractionBookingRepository.findByBookingIdIn(bookingIds);
+    }
 
     @Transactional
     public AttractionBooking createAttractionBooking(AttractionBookingRequest request) {
