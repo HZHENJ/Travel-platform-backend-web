@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @ClassName AttractionBookingRequest
@@ -19,9 +21,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttractionBookingRequest {
-    private Integer userId;       // 用户ID
-    private String uuid;          // 景点UUID
-    private LocalDate visitDate;  // 参观日期
-    private String ticketType;    // 门票类型
-    private Integer numberOfTickets; // 预订门票数量
+    private Integer userId;             // 用户ID
+    private String uuid;                // 景点UUID
+    private LocalDate visitDate;        // 参观日期
+    private LocalDateTime visitTime;    // 参观时间
+    private Integer numberOfTickets;    // 预订门票数量
+    private Double price;      // 价格
 }

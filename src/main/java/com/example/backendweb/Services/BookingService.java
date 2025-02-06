@@ -39,14 +39,19 @@ public class BookingService {
     public AttractionBooking createAttractionBooking(AttractionBookingRequest request) {
         // Step 1: 验证景点信息
         Attraction attraction = attractionRepository.findByUuid(request.getUuid())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid attraction UUID: " + request.getUuid()));
+                .orElseGet(() -> {
+                    Attraction newAttraction = Attraction.builder()
+                            .uuid(request.getUuid())
+                            .build();
+                    return attractionRepository.save(newAttraction);
+                });
 
         // Step 2: 创建通用 Booking 记录
         Booking booking = Booking.builder()
                 .userId(request.getUserId())
                 .bookingType(Booking.BookingType.Attraction)
                 .status(Booking.BookingStatus.Pending)
-                // .totalAmount(calculateTotalAmount(attraction.getTicketType(), request.getTicketType(), request.getNumberOfTickets()))
+                .totalAmount(new BigDecimal(request.getPrice()))
                 .build();
         booking = bookingRepository.save(booking);
 
@@ -55,23 +60,11 @@ public class BookingService {
                 .bookingId(booking.getBookingId())
                 .attractionId(attraction.getAttractionId())
                 .visitDate(request.getVisitDate())
-                // .ticketType(request.getTicketType())
+                .visitTime(request.getVisitTime())
                 .numberOfTickets(request.getNumberOfTickets())
                 .build();
         attractionBookingRepository.save(attractionBooking);
 
         return attractionBooking;
     }
-
-    // 计算总金额
-    private BigDecimal calculateTotalAmount(Map<String, String> ticketPrices, String ticketType, Integer numberOfTickets) {
-        String priceString = ticketPrices.get(ticketType);
-        if (priceString == null) {
-            throw new IllegalArgumentException("Invalid ticket type: " + ticketType);
-        }
-
-        BigDecimal pricePerTicket = new BigDecimal(priceString);
-        return pricePerTicket.multiply(new BigDecimal(numberOfTickets));
-    }
-
 }
