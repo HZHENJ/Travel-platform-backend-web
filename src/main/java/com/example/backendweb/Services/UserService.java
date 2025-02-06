@@ -1,9 +1,9 @@
 package com.example.backendweb.Services;
 
 
-import com.example.backendweb.Repository.AuthenticationRepository;
-import com.example.backendweb.Repository.PreferenceRepository;
-import com.example.backendweb.Repository.UserRepository;
+import com.example.backendweb.Repository.User.AuthenticationRepository;
+import com.example.backendweb.Repository.User.PreferenceRepository;
+import com.example.backendweb.Repository.User.UserRepository;
 import com.example.backendweb.Entity.Exception.CustomException;
 import com.example.backendweb.Entity.User.Authentication;
 import com.example.backendweb.Entity.User.Preference;
@@ -28,7 +28,8 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User Login(String Username,String Password){
+    //
+    public User Login(String Username, String Password){
         Optional<Authentication> data = authenticationRepository.findByUsername(Username);
         if(data.isPresent() && data.get().getPasswordHash().equals(Password)){
             return data.get().getUser();
@@ -37,10 +38,12 @@ public class UserService {
         }
     }
 
+    //
     public boolean RetriveData(Authentication auth, User user, Preference pre){
         return registerUser(user) && registerAuthentication(auth,user) && registerPreference(pre,user);
     }
 
+    //
     public boolean registerUser(User user){
         if(user == null) throw new CustomException("Empty Data",400);
         Optional<User> existingUser = userRepository.findById(user.getUserId());
@@ -49,6 +52,7 @@ public class UserService {
         return true;
     }
 
+    //
     public boolean registerAuthentication(Authentication auth,User user){
         if(auth == null || user == null) throw new CustomException("Empty Data",400);
         Optional<Authentication> existingAuth = authenticationRepository.findById(auth.getAuthId());
@@ -59,6 +63,7 @@ public class UserService {
         return true;
     }
 
+    //
     public boolean registerPreference(Preference pre,User user){
         if(pre == null || user == null) throw new CustomException("Empty Data",400);
         Optional<Authentication> existingPre = authenticationRepository.findById(pre.getPreferenceId());
