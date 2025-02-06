@@ -46,7 +46,7 @@ public class BookingService {
                 .userId(request.getUserId())
                 .bookingType(Booking.BookingType.Attraction)
                 .status(Booking.BookingStatus.Pending)
-                .totalAmount(calculateTotalAmount(attraction.getTicketType(), request.getTicketType(), request.getNumberOfTickets()))
+                // .totalAmount(calculateTotalAmount(attraction.getTicketType(), request.getTicketType(), request.getNumberOfTickets()))
                 .build();
         booking = bookingRepository.save(booking);
 
@@ -55,7 +55,7 @@ public class BookingService {
                 .bookingId(booking.getBookingId())
                 .attractionId(attraction.getAttractionId())
                 .visitDate(request.getVisitDate())
-                .ticketType(request.getTicketType())
+                // .ticketType(request.getTicketType())
                 .numberOfTickets(request.getNumberOfTickets())
                 .build();
         attractionBookingRepository.save(attractionBooking);
