@@ -64,7 +64,8 @@ public class ReviewService {
      */
     public Review createReview(Review review) {
         Review savedReview = reviewRepository.save(review);
-        reviewStatsService.updateReviewStats(savedReview);
+        List<Review> reviews = reviewRepository.findByItemIdAndItemType(review.getUserId(),review.getItemType());
+        reviewStatsService.updateReviewStats(reviews);
         return savedReview;
     }
 
@@ -84,7 +85,8 @@ public class ReviewService {
             existingReview.setComment(review.getComment());
             existingReview.setStatus(review.getStatus());
             Review updatedReview = reviewRepository.save(existingReview);
-            reviewStatsService.updateReviewStats(updatedReview);
+            List<Review> reviews = reviewRepository.findByItemIdAndItemType(review.getUserId(),review.getItemType());
+            reviewStatsService.updateReviewStats(reviews);
             return updatedReview;
         });
     }
@@ -100,7 +102,8 @@ public class ReviewService {
         if (reviewOptional.isPresent()) {
             Review review = reviewOptional.get();
             reviewRepository.deleteById(id);
-            reviewStatsService.updateReviewStats(review);
+            List<Review> reviews = reviewRepository.findByItemIdAndItemType(review.getUserId(),review.getItemType());
+            reviewStatsService.updateReviewStats(reviews);
             return true;
         }
         return false;
