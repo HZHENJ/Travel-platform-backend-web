@@ -1,7 +1,7 @@
 package com.example.backendweb.Controller;
 
 import com.example.backendweb.Entity.Review.Review;
-import com.example.backendweb.Services.ReviewService;
+import com.example.backendweb.Services.Review.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

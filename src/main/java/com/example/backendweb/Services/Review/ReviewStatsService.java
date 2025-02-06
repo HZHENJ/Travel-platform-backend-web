@@ -1,4 +1,4 @@
-package com.example.backendweb.Services;
+package com.example.backendweb.Services.Review;
 
 import com.example.backendweb.Entity.Review.Review;
 import com.example.backendweb.Entity.Review.ReviewStats;
