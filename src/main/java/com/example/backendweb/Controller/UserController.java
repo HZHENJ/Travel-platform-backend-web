@@ -41,13 +41,11 @@ public class UserController {
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationRequest request) {
         User user = User.builder()
                 .email(request.getEmail())
-                .status(User.Status.Active)
                 .build();
 
         Authentication auth = Authentication.builder()
                 .username(request.getEmail())
                 .passwordHash(request.getPassword())
-                .role(Authentication.Role.User)
                 .build();
 
         Preference preference = request.getPreference(); // `Preference` 可选
