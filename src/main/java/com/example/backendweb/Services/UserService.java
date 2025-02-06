@@ -10,6 +10,7 @@ import com.example.backendweb.Entity.User.Preference;
 import com.example.backendweb.Entity.User.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public boolean registerUserData(Authentication auth, User user, Preference pre){
         boolean userRegistered = registerUser(user);
         boolean authRegistered = registerAuthentication(auth, user);
@@ -65,12 +67,9 @@ public class UserService {
         if(auth == null || user == null) {
             throw new CustomException("Empty Data",400);
         }
-        Optional<Authentication> existingAuth = authenticationRepository.findById(auth.getAuthId());
-
-        if(existingAuth.isPresent()) {
-            throw new CustomException("User already exits",409);
+        if (authenticationRepository.findByUsername(auth.getUsername()).isPresent()) {
+            throw new CustomException("User already exists", 409);
         }
-
         auth.setPasswordHash(bCryptPasswordEncoder.encode(auth.getPasswordHash()));
         auth.setUser(user);
         authenticationRepository.save(auth);
