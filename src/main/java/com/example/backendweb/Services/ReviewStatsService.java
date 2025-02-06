@@ -13,32 +13,27 @@ import java.util.Optional;
 @Service
 public class ReviewStatsService {
 
-    private final ReviewService reviewService;
-
     private final ReviewStatsRepository reviewStatsRepository;
 
-    public ReviewStatsService(ReviewService reviewService, ReviewStatsRepository reviewStatsRepository) {
-        this.reviewService = reviewService;
+    public ReviewStatsService( ReviewStatsRepository reviewStatsRepository) {
         this.reviewStatsRepository = reviewStatsRepository;
     }
 
 
+
     /**
-     * Updates the review statistics for a given item based on a new review.
+     * Updates the review statistics for a given list of reviews
      *
-     * @param review The new review that triggered the update
+     * @param reviews The list of reviews to update statistics for
      */
-    public void updateReviewStats(Review review) {
-        // Extract item ID and type from the review
-        Integer itemId = review.getItemId();
-        Review.ItemType itemType = review.getItemType();
+    public void updateReviewStats(List<Review> reviews) {
+        // Get the item ID and type from the first review in the list
+        Integer itemId = reviews.get(0).getItemId();
+        Review.ItemType itemType = reviews.get(0).getItemType();
 
-        // Fetch all reviews for the given item
-        List<Review> reviews = reviewService.getReviewsByItem(itemId, itemType);
-
-        // Calculate total number of reviews
+        // Calculate the total number of reviews
         int totalReviews = reviews.size();
-        // Calculate average rating
+        // Calculate the average rating for all reviews
         BigDecimal averageRating = calculateAverageRating(reviews);
 
         // Try to find existing review stats for the item
