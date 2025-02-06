@@ -91,4 +91,12 @@ public class UserService {
         preferenceRepository.save(pre);
         return true;
     }
+
+    /**
+     * 根据用户名获取 `Authentication` 记录
+     */
+    public Authentication getUserAuthentication(String username) {
+        return authenticationRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException("Authentication record not found for user: " + username, 500));
+    }
 }
