@@ -48,9 +48,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.Active; // 用户状态默认为Status.Active
+    private Status status; // 用户状态默认为Status.Active
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String country; // 用户所在国家
 
     @PrePersist
