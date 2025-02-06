@@ -17,7 +17,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY = "YOUR_SECRET_KEY";
+    private static final String SECRET_KEY = "EiX6yZgMPaGJwWMEov+URGp7e6LnVG+JNfbgQB78Epo=";
     private static final long EXPIRATION_TIME = 86400000; // 1 天
 
     public String generateToken(Integer userId, Authentication.Role role) {
