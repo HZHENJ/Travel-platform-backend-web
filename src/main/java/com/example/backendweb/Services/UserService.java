@@ -28,27 +28,29 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    //
-    public User login(String Username, String Password){
-        Optional<Authentication> data = authenticationRepository.findByUsername(Username);
-        // if (data.isPresent() && bCryptPasswordEncoder.matches(password, data.get().getPasswordHash()))
-        if(data.isPresent() && data.get().getPasswordHash().equals(Password)){
+    public User login(String username, String password){
+        Optional<Authentication> data = authenticationRepository.findByUsername(username);
+        if (data.isPresent() && bCryptPasswordEncoder.matches(password, data.get().getPasswordHash())){
             return data.get().getUser();
         }else{
             throw new CustomException("User not exist or Wrong password",400);
         }
     }
 
-    //
     public boolean registerUserData(Authentication auth, User user, Preference pre){
-        return registerUser(user) && registerAuthentication(auth,user) && registerPreference(pre,user);
+        boolean userRegistered = registerUser(user);
+        boolean authRegistered = registerAuthentication(auth, user);
+        boolean preRegistered = registerPreference(pre, user);
+        return userRegistered && authRegistered && preRegistered;
     }
 
     /**
-     * register User
+     * 注册 `User`
      */
     public boolean registerUser(User user) {
-        if (user == null) throw new CustomException("Empty Data", 400);
+        if (user == null) {
+            throw new CustomException("Empty Data", 400);
+        }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new CustomException("User already exists", 409);
         }
@@ -56,6 +58,9 @@ public class UserService {
         return true;
     }
 
+    /**
+     * 注册 `Authentication`
+     */
     public boolean registerAuthentication(Authentication auth, User user){
         if(auth == null || user == null) {
             throw new CustomException("Empty Data",400);
@@ -72,12 +77,18 @@ public class UserService {
         return true;
     }
 
-    //
     public boolean registerPreference(Preference pre,User user){
-        if(pre == null || user == null) throw new CustomException("Empty Data",400);
-        Optional<Authentication> existingPre = authenticationRepository.findById(pre.getPreferenceId());
-        if(existingPre.isPresent()) throw new CustomException("User already exits",409);
-        pre.setUser(user);
+        if(user == null) {
+            throw new CustomException("Empty Data",400);
+        }
+        // if `pre` is null，create default `Preference`
+        if(pre == null) {
+            pre = Preference.builder()
+                    .user(user)
+                    .build();
+        } else {
+            pre.setUser(user);
+        }
         preferenceRepository.save(pre);
         return true;
     }
