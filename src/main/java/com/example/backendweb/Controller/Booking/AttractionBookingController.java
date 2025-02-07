@@ -1,6 +1,7 @@
 package com.example.backendweb.Controller.Booking;
 
-import com.example.backendweb.DTO.AttractionBookingRequest;
+import com.example.backendweb.DTO.Booking.AttractionBookingDTO;
+import com.example.backendweb.DTO.Booking.AttractionBookingRequest;
 import com.example.backendweb.Entity.Booking.AttractionBooking;
 import com.example.backendweb.Services.BookingService;
 import org.springframework.http.ResponseEntity;
@@ -41,8 +42,8 @@ public class AttractionBookingController {
     }
 
     @GetMapping("/bookings/{userId}")
-    public ResponseEntity<List<AttractionBooking>> getAttractionBookingsByUser(@PathVariable Integer userId) {
-        List<AttractionBooking> attractionBookings = bookingService.getAttractionBookingsByUserId(userId);
+    public ResponseEntity<List<AttractionBookingDTO>> getAttractionBookingsByUser(@PathVariable Integer userId) {
+        List<AttractionBookingDTO> attractionBookings = bookingService.getAttractionBookingsByUserId(userId);
         return ResponseEntity.ok(attractionBookings);
     }
 

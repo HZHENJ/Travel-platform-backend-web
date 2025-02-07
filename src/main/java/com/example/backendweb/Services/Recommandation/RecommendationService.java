@@ -84,16 +84,18 @@ public class RecommendationService {
 
             for (Review review : otherUserReviews) {
                 if (review.getItemType() == Review.ItemType.Attraction && !visitedAttractions.contains(review.getItemId())) {
+                    // attractionScores.put(review.getItemId(),
+                    //         attractionScores.getOrDefault(review.getItemId(), 0.0)
+                    //                 + similarity * review.getRating().doubleValue());
                     attractionScores.put(review.getItemId(),
-                            attractionScores.getOrDefault(review.getItemId(), 0.0)
-                                    + similarity * review.getRating().doubleValue());
+                            attractionScores.getOrDefault(review.getItemId(), 0.0) + (similarity * review.getRating().doubleValue()) / (1 + similarity));
                 }
             }
         }
 
         return attractionScores.entrySet().stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
-                .limit(10) // 取前10个个性化推荐
+                .limit(3) // 取前10个个性化推荐
                 .map(entry -> attractionRepository.findById(entry.getKey()).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

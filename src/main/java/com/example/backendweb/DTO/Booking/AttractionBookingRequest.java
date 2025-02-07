@@ -1,4 +1,4 @@
-package com.example.backendweb.DTO;
+package com.example.backendweb.DTO.Booking;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

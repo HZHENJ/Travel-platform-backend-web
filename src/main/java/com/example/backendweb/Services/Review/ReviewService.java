@@ -1,9 +1,14 @@
 package com.example.backendweb.Services.Review;
 
+import com.example.backendweb.DTO.Review.ReviewRequest;
 import com.example.backendweb.Entity.Review.Review;
+import com.example.backendweb.Entity.Review.ReviewStats;
 import com.example.backendweb.Repository.Review.ReviewRepository;
+import com.example.backendweb.Repository.Review.ReviewStatsRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,8 +17,9 @@ import java.util.Optional;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-
     private final ReviewStatsService reviewStatsService;
+
+    private final ReviewStatsRepository reviewStatsRepository;
 
     /**
      * Constructor for ReviewService.
@@ -21,9 +27,11 @@ public class ReviewService {
      * @param reviewRepository Repository for handling Review entities
      * @param reviewStatsService Service for handling review statistics
      */
-    public ReviewService(ReviewRepository reviewRepository, ReviewStatsService reviewStatsService) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewStatsService reviewStatsService,
+                         ReviewStatsRepository reviewStatsRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewStatsService = reviewStatsService;
+        this.reviewStatsRepository = reviewStatsRepository;
     }
 
     /**
@@ -54,19 +62,6 @@ public class ReviewService {
      */
     public List<Review> getReviewsByItem(Integer itemId, Review.ItemType itemType) {
         return reviewRepository.findByItemIdAndItemType(itemId, itemType);
-    }
-
-    /**
-     * Creates a new review and updates the review statistics.
-     *
-     * @param review The Review entity to be created
-     * @return The saved Review entity
-     */
-    public Review createReview(Review review) {
-        Review savedReview = reviewRepository.save(review);
-        List<Review> reviews = reviewRepository.findByItemIdAndItemType(review.getUserId(),review.getItemType());
-        reviewStatsService.updateReviewStats(reviews);
-        return savedReview;
     }
 
     /**
@@ -107,5 +102,50 @@ public class ReviewService {
             return true;
         }
         return false;
+    }
+
+    @Transactional
+    public Review createReview(ReviewRequest request) {
+        // Step 1: 存储 Review
+        Review review = Review.builder()
+                .userId(request.getUserId())
+                .itemType(Review.ItemType.valueOf(request.getItemType()))
+                .itemId(request.getItemId())
+                .rating(request.getRating())
+                .comment(request.getComment())
+                .status(Review.ReviewStatus.show) // 直接显示评论
+                .build();
+        reviewRepository.save(review);
+
+        // Step 2: 更新 ReviewStats
+        Optional<ReviewStats> existingStats = reviewStatsRepository.findByItemIdAndItemType(
+                request.getItemId(), ReviewStats.ItemType.valueOf(request.getItemType())
+        );
+
+        if (existingStats.isPresent()) {
+            ReviewStats stats = existingStats.get();
+            stats.setTotalReviews(stats.getTotalReviews() + 1);
+            stats.setAverageRating(
+                    stats.getAverageRating().multiply(BigDecimal.valueOf(stats.getTotalReviews()))
+                            .add(request.getRating())
+                            .divide(BigDecimal.valueOf(stats.getTotalReviews() + 1), 1, BigDecimal.ROUND_HALF_UP)
+            );
+            reviewStatsRepository.save(stats);
+        } else {
+            ReviewStats newStats = ReviewStats.builder()
+                    .itemType(ReviewStats.ItemType.valueOf(request.getItemType()))
+                    .itemId(request.getItemId())
+                    .totalReviews(1)
+                    .averageRating(request.getRating())
+                    .build();
+            reviewStatsRepository.save(newStats);
+        }
+
+        return review;
+    }
+
+    // 检查用户是否已评论
+    public boolean hasUserReviewed(Integer userId, Integer itemId) {
+        return reviewRepository.existsByUserIdAndItemId(userId, itemId);
     }
 }

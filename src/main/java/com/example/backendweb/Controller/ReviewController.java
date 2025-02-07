@@ -1,11 +1,13 @@
 package com.example.backendweb.Controller;
 
+import com.example.backendweb.DTO.Review.ReviewRequest;
 import com.example.backendweb.Entity.Review.Review;
 import com.example.backendweb.Services.Review.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -40,17 +42,6 @@ public class ReviewController {
         return reviewService.getReviewsByItem(itemId, itemType);
     }
 
-
-
-    // 创建评论
-    @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody Review review) {
-        Review createdReview = reviewService.createReview(review);
-        return ResponseEntity.status(201).body(createdReview);
-    }
-
-
-
     // 更新评论
     @PutMapping("/{id}")
     public ResponseEntity<Review> updateReview(@PathVariable Integer id, @RequestBody Review review) {
@@ -67,4 +58,22 @@ public class ReviewController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping
+    public ResponseEntity<?> createReview(@RequestBody ReviewRequest request) {
+        try {
+            Review review = reviewService.createReview(request);
+            return ResponseEntity.ok(review);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Review failed: " + e.getMessage());
+        }
+    }
+
+    // 检查用户是否已经评论
+    @GetMapping("/check")
+    public ResponseEntity<?> checkUserReview(@RequestParam Integer userId, @RequestParam Integer itemId) {
+        boolean exists = reviewService.hasUserReviewed(userId, itemId);
+        return ResponseEntity.ok().body(Map.of("exists", exists));
+    }
+
 }

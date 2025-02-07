@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface AttractionRepository extends JpaRepository<Attraction,Integer> {
     boolean existsByUuid(String uuid);
     Optional<Attraction> findByUuid(String uuid);
+    Optional<Attraction> findByAttractionId(Integer attractionId);
 }
