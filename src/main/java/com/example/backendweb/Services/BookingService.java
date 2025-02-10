@@ -47,18 +47,18 @@ public class BookingService {
     }
 
     public List<AttractionBookingDTO> getAttractionBookingsByUserId(Integer userId) {
-        // **1. 查询该用户的所有 Booking**
+        // 1. 查询该用户的所有 Booking
         List<Booking> userBookings = bookingRepository.findByUserId(userId);
 
-        // **2. 提取 bookingId**
+        // 2. 提取 bookingId
         List<Integer> bookingIds = userBookings.stream()
                 .map(Booking::getBookingId)
                 .collect(Collectors.toList());
 
-        // **3. 查询所有景点预订**
+        // 3. 查询所有景点预订
         List<AttractionBooking> attractionBookings = attractionBookingRepository.findByBookingIdIn(bookingIds);
 
-        // **4. 通过 attractionId 查询 Attraction UUID**
+        // 4. 通过 attractionId 查询 Attraction UUID
         return attractionBookings.stream().map(attractionBooking -> {
             String attractionUuid = attractionRepository.findByAttractionId(attractionBooking.getAttractionId())
                     .map(Attraction::getUuid)
@@ -92,7 +92,7 @@ public class BookingService {
                 .userId(request.getUserId())
                 .bookingType(Booking.BookingType.Attraction)
                 .status(Booking.BookingStatus.Pending)
-                .totalAmount(new BigDecimal(request.getPrice()))
+                .totalAmount(new BigDecimal(request.getPrice())) // TODO 0
                 .build();
         booking = bookingRepository.save(booking);
 
