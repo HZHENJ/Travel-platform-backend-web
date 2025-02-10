@@ -68,7 +68,7 @@ public class BookingService {
                     attractionBooking.getAttractionBookingId(),
                     attractionBooking.getBookingId(),
                     attractionBooking.getAttractionId(),
-                    attractionUuid, // ✅ 加入景点 UUID
+                    attractionUuid,
                     attractionBooking.getVisitDate(),
                     attractionBooking.getVisitTime(),
                     attractionBooking.getNumberOfTickets()
