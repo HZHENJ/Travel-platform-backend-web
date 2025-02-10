@@ -10,6 +10,7 @@ import com.example.backendweb.Entity.Review.ReviewStats;
 import com.example.backendweb.Repository.AttractionRepository;
 import com.example.backendweb.Repository.Booking.AttractionBookingRepository;
 import com.example.backendweb.Repository.Booking.BookingRepository;
+import com.example.backendweb.Repository.Review.ReviewRepository;
 import com.example.backendweb.Repository.Review.ReviewStatsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,15 +36,19 @@ public class BookingService {
     private final AttractionRepository attractionRepository;
     private final ReviewStatsRepository reviewStatsRepository;
 
+    private final ReviewRepository reviewRepository;
+
     public BookingService(BookingRepository bookingRepository,
                           AttractionBookingRepository attractionBookingRepository,
                           AttractionRepository attractionRepository,
-                          ReviewStatsRepository reviewStatsRepository
+                          ReviewStatsRepository reviewStatsRepository,
+                          ReviewRepository reviewRepository
     ) {
         this.bookingRepository = bookingRepository;
         this.attractionBookingRepository = attractionBookingRepository;
         this.attractionRepository = attractionRepository;
         this.reviewStatsRepository = reviewStatsRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public List<AttractionBookingDTO> getAttractionBookingsByUserId(Integer userId) {
@@ -92,7 +97,7 @@ public class BookingService {
                 .userId(request.getUserId())
                 .bookingType(Booking.BookingType.Attraction)
                 .status(Booking.BookingStatus.Pending)
-                .totalAmount(new BigDecimal(request.getPrice())) // TODO 0
+                .totalAmount(new BigDecimal(request.getPrice()))
                 .build();
         booking = bookingRepository.save(booking);
 
@@ -119,6 +124,18 @@ public class BookingService {
                     .build();
             reviewStatsRepository.save(reviewStats);
         }
+
+        // Step 5: 创建 Review 记录
+        Review review = Review.builder()
+                .bookingId(booking.getBookingId())
+                .userId(request.getUserId())
+                .itemType(Review.ItemType.Attraction)
+                .itemId(attraction.getAttractionId())
+                .rating(BigDecimal.ZERO) // 初始评分 0
+                .comment("Default review. No comment provided.") // 默认评论内容
+                .status(Review.ReviewStatus.hide) // 初始状态为隐藏
+                .build();
+        reviewRepository.save(review);
 
         return attractionBooking;
     }

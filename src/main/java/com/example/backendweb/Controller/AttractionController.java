@@ -1,5 +1,6 @@
 package com.example.backendweb.Controller;
 
+import com.example.backendweb.DTO.Review.ReviewWithUsernameDTO;
 import com.example.backendweb.Entity.Review.Review;
 import com.example.backendweb.Services.AttractionService;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +29,10 @@ public class AttractionController {
         this.attractionService = attractionService;
     }
 
-    //
     @GetMapping("/{uuid}/reviews")
     public ResponseEntity<List<Review>> getReviewsByAttractionUuid(@PathVariable String uuid) {
         try {
+            // List<ReviewWithUsernameDTO> reviews = attractionService.getReviewsWithUsernameByUuid(uuid);
             List<Review> reviews = attractionService.getReviewsByUuid(uuid);
             return ResponseEntity.ok(reviews);
         } catch (IllegalArgumentException e) {
