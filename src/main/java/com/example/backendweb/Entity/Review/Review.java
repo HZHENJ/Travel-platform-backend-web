@@ -34,7 +34,7 @@ public class Review {
     private ItemType itemType; // 评价对象类型 (酒店或景点)
 
     @Column(nullable = false)
-    private Integer itemId; // 评价对象ID (如航班ID、酒店ID、景点ID)
+    private Integer itemId; // 评价对象ID (酒店ID、景点ID)
 
     @Column(nullable = false, precision = 2, scale = 1)
     private BigDecimal rating; // 评分

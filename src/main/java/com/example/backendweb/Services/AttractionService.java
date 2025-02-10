@@ -2,7 +2,9 @@ package com.example.backendweb.Services;
 
 import com.example.backendweb.Entity.Info.Attraction;
 import com.example.backendweb.DTO.AttractionDTO;
+import com.example.backendweb.Entity.Review.Review;
 import com.example.backendweb.Repository.AttractionRepository;
+import com.example.backendweb.Repository.Review.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -11,9 +13,12 @@ import java.util.*;
 public class AttractionService {
 
     private final AttractionRepository attractionRepository;
+    private final ReviewRepository reviewRepository;
 
-    public AttractionService(AttractionRepository attractionRepository) {
+    public AttractionService(AttractionRepository attractionRepository,
+                             ReviewRepository reviewRepository) {
         this.attractionRepository = attractionRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public List<Attraction> saveAttractions(List<AttractionDTO> attractionDTOs) {
@@ -66,5 +71,14 @@ public class AttractionService {
             ticketAvailability.put(ticket, random.nextInt(100) + 1); // 随机生成1到100之间的票数
         }
         return ticketAvailability;
+    }
+
+    public List<Review> getReviewsByUuid(String uuid) {
+        // Step 1: 根据 UUID 查询景点
+        Attraction attraction = attractionRepository.findByUuid(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("Attraction not found for UUID: " + uuid));
+
+        // Step 2: 查询与该景点相关的评论
+        return reviewRepository.findByAttractionId(attraction.getAttractionId());
     }
 }

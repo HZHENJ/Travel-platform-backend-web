@@ -26,10 +26,13 @@ public class Hotel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer hotelId; // 酒店唯一标识
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, unique = true)
+    private String uuid; // 景点唯一标识
+
+    @Column(length = 255)
     private String hotelName; // 酒店名称
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String location; // 酒店位置
 
     @Column(columnDefinition = "TEXT")
