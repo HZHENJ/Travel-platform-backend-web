@@ -5,6 +5,7 @@ import com.example.backendweb.DTO.Booking.HotelBookingDTO;
 import com.example.backendweb.DTO.Booking.HotelBookingRequest;
 import com.example.backendweb.Entity.Booking.HotelBooking;
 import com.example.backendweb.Services.BookingService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,5 +46,19 @@ public class HotelBookingController {
     public ResponseEntity<List<HotelBookingDTO>> getHotelBookingsByUser(@PathVariable Integer userId) {
         List<HotelBookingDTO> hotelBookings = bookingService.getHotelBookingsByUserId(userId);
         return ResponseEntity.ok(hotelBookings);
+    }
+
+    /**
+     * 取消酒店预订
+     */
+    @DeleteMapping("/booking/{bookingId}")
+    public ResponseEntity<?> cancelHotelBooking(@PathVariable Integer bookingId) {
+        try {
+            bookingService.cancelHotelBooking(bookingId);
+            return ResponseEntity.ok("Hotel booking canceled successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to cancel booking: " + e.getMessage());
+        }
     }
 }

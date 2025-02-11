@@ -106,10 +106,17 @@ public class BookingService {
         List<HotelBooking> hotelBookings = hotelBookingRepository.findByBookingIdIn(bookingIds);
 
         // 4. 通过 hotelId 查询 Hotel UUID
-        return hotelBookings.stream().map(hotelBooking -> {
-            String hotelUuid = hotelRepository.findById(hotelBooking.getHotelId())
-                    .map(Hotel::getUuid)
-                    .orElse(null); // 如果找不到酒店，返回 null
+        return hotelBookings.stream()
+                .map(hotelBooking -> {
+                    String bookingStatus = userBookings.stream()
+                            .filter(b -> b.getBookingId().equals(hotelBooking.getBookingId()))
+                            .findFirst()
+                            .map(b -> b.getStatus().name())  // 获取 `Booking.status`
+                            .orElse("Unknown");
+
+                    String hotelUuid = hotelRepository.findById(hotelBooking.getHotelId())
+                            .map(Hotel::getUuid)
+                            .orElse(null); // 如果找不到酒店，返回 null
 
             // 5. 获取对应的 Booking 记录
             Booking booking = userBookings.stream()
@@ -126,7 +133,8 @@ public class BookingService {
                     hotelBooking.getCheckOutDate(),
                     hotelBooking.getRoomType(),
                     hotelBooking.getGuests(),
-                    booking != null ? booking.getTotalAmount().doubleValue() : null // 确保转换为 Double
+                    booking != null ? booking.getTotalAmount().doubleValue() : null, // 确保转换为 Double
+                    bookingStatus
             );
         }).collect(Collectors.toList());
     }
@@ -281,5 +289,20 @@ public class BookingService {
 
         // 删除 AttractionBooking 记录
         // attractionBookingRepository.delete(attractionBooking);
+    }
+
+    @Transactional
+    public void cancelHotelBooking(Integer bookingId) {
+        // 使用 `findByBookingId` 查找酒店预订
+        HotelBooking hotelBooking = hotelBookingRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Hotel booking not found for bookingId: " + bookingId));
+
+        // 查找对应的 Booking 记录
+        Booking booking = bookingRepository.findById(hotelBooking.getBookingId())
+                .orElseThrow(() -> new IllegalArgumentException("Booking record not found for ID: " + hotelBooking.getBookingId()));
+
+        // 更新 Booking 状态为 Canceled
+        booking.setStatus(Booking.BookingStatus.Canceled);
+        bookingRepository.save(booking);
     }
 }

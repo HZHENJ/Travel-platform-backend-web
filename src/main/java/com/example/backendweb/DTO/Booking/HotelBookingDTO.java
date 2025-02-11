@@ -29,4 +29,5 @@ public class HotelBookingDTO {
     private String roomType;
     private Integer guests;
     private Double totalAmount;
+    private String status;
 }
