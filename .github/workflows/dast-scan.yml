@@ -1,4 +1,3 @@
-on:
 jobs:
   dast-scan:
     runs-on: ubuntu-latest
