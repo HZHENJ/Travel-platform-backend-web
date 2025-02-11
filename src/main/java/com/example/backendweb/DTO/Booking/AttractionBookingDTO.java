@@ -27,4 +27,5 @@ public class AttractionBookingDTO {
     private LocalDate visitDate;
     private LocalDateTime visitTime;
     private Integer numberOfTickets;
+    private String status;
 }

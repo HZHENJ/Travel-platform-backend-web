@@ -76,10 +76,16 @@ public class BookingService {
         List<AttractionBooking> attractionBookings = attractionBookingRepository.findByBookingIdIn(bookingIds);
 
         // 4. 通过 attractionId 查询 Attraction UUID
-        return attractionBookings.stream().map(attractionBooking -> {
-            String attractionUuid = attractionRepository.findByAttractionId(attractionBooking.getAttractionId())
-                    .map(Attraction::getUuid)
-                    .orElse(null); // 如果找不到景点，返回 null
+        return attractionBookings.stream()
+                .map(attractionBooking -> {
+                    String attractionUuid = attractionRepository.findByAttractionId(attractionBooking.getAttractionId())
+                            .map(Attraction::getUuid)
+                            .orElse(null); // 如果找不到景点，返回 null
+
+                    Booking booking = userBookings.stream()
+                            .filter(b->b.getBookingId().equals(attractionBooking.getBookingId()))
+                            .findFirst()
+                            .orElse(null);
 
             return new AttractionBookingDTO(
                     attractionBooking.getAttractionBookingId(),
@@ -88,7 +94,8 @@ public class BookingService {
                     attractionUuid,
                     attractionBooking.getVisitDate(),
                     attractionBooking.getVisitTime(),
-                    attractionBooking.getNumberOfTickets()
+                    attractionBooking.getNumberOfTickets(),
+                    booking != null ? booking.getStatus().name() : "Unknown"
             );
         }).collect(Collectors.toList());
     }
