@@ -1,6 +1,7 @@
 package com.example.backendweb.Controller.Booking;
 
 import com.example.backendweb.DTO.Booking.AttractionBookingDTO;
+import com.example.backendweb.DTO.Booking.HotelBookingDTO;
 import com.example.backendweb.DTO.Booking.HotelBookingRequest;
 import com.example.backendweb.Entity.Booking.HotelBooking;
 import com.example.backendweb.Services.BookingService;
@@ -38,5 +39,11 @@ public class HotelBookingController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/bookings/{userId}")
+    public ResponseEntity<List<HotelBookingDTO>> getHotelBookingsByUser(@PathVariable Integer userId) {
+        List<HotelBookingDTO> hotelBookings = bookingService.getHotelBookingsByUserId(userId);
+        return ResponseEntity.ok(hotelBookings);
     }
 }

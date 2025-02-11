@@ -2,6 +2,7 @@ package com.example.backendweb.Services;
 
 import com.example.backendweb.DTO.Booking.AttractionBookingDTO;
 import com.example.backendweb.DTO.Booking.AttractionBookingRequest;
+import com.example.backendweb.DTO.Booking.HotelBookingDTO;
 import com.example.backendweb.DTO.Booking.HotelBookingRequest;
 import com.example.backendweb.Entity.Booking.AttractionBooking;
 import com.example.backendweb.Entity.Booking.Booking;
@@ -88,6 +89,36 @@ public class BookingService {
                     attractionBooking.getVisitDate(),
                     attractionBooking.getVisitTime(),
                     attractionBooking.getNumberOfTickets()
+            );
+        }).collect(Collectors.toList());
+    }
+
+    public List<HotelBookingDTO> getHotelBookingsByUserId(Integer userId) {
+        // 获取所有 `Booking` 记录
+        List<Booking> userBookings = bookingRepository.findByUserIdAndBookingType(userId, Booking.BookingType.Hotel);
+
+        // 通过 `bookingId` 获取所有酒店预订
+        List<HotelBooking> hotelBookings = hotelBookingRepository.findByBookingIdIn(
+                userBookings.stream().map(Booking::getBookingId).collect(Collectors.toList())
+        );
+
+        // 转换为 DTO
+        return hotelBookings.stream().map(booking -> {
+            Hotel hotel = hotelRepository.findById(booking.getHotelId()).orElse(null);
+            return new HotelBookingDTO(
+                    booking.getBookingId(),
+                    hotel != null ? hotel.getHotelName() : "Unknown Hotel",
+                    hotel != null ? hotel.getLocation() : "Unknown Location",
+                    booking.getCheckInDate(),
+                    booking.getCheckOutDate(),
+                    booking.getRoomType(),
+                    booking.getGuests(),
+                    userBookings.stream()
+                            .filter(b -> b.getBookingId().equals(booking.getBookingId()))
+                            .findFirst()
+                            .map(b -> b.getTotalAmount() != null ? b.getTotalAmount().doubleValue() : null)
+                            // .map(Booking::getTotalAmount)
+                            .orElse(null)
             );
         }).collect(Collectors.toList());
     }

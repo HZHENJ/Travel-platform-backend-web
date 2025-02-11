@@ -3,6 +3,8 @@ package com.example.backendweb.Repository.Booking;
 import com.example.backendweb.Entity.Booking.HotelBooking;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  * @ClassName HotelBookingRepository
  * @Description
@@ -13,4 +15,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface HotelBookingRepository extends JpaRepository<HotelBooking, Integer> {
     long countByHotelId(Integer hotelId);
+    List<HotelBooking> findByBookingIdIn(List<Integer> bookingIds);
 }
