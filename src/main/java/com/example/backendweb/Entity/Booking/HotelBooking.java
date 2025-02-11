@@ -40,7 +40,7 @@ public class HotelBooking {
     @Column(nullable = false, length = 100)
     private String roomType; // 房间类型
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String location; // 酒店位置
 
     @Column(nullable = false)

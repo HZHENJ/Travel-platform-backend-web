@@ -10,6 +10,8 @@ import com.example.backendweb.Entity.Review.ReviewStats;
 import com.example.backendweb.Repository.AttractionRepository;
 import com.example.backendweb.Repository.Booking.AttractionBookingRepository;
 import com.example.backendweb.Repository.Booking.BookingRepository;
+import com.example.backendweb.Repository.Booking.HotelBookingRepository;
+import com.example.backendweb.Repository.HotelRepository;
 import com.example.backendweb.Repository.Review.ReviewRepository;
 import com.example.backendweb.Repository.Review.ReviewStatsRepository;
 import org.springframework.stereotype.Service;
@@ -34,19 +36,24 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final AttractionBookingRepository attractionBookingRepository;
     private final AttractionRepository attractionRepository;
+    private final HotelBookingRepository hotelBookingRepository;
+    private final HotelRepository hotelRepository;
     private final ReviewStatsRepository reviewStatsRepository;
-
     private final ReviewRepository reviewRepository;
 
     public BookingService(BookingRepository bookingRepository,
                           AttractionBookingRepository attractionBookingRepository,
                           AttractionRepository attractionRepository,
+                          HotelBookingRepository hotelBookingRepository,
+                          HotelRepository hotelRepository,
                           ReviewStatsRepository reviewStatsRepository,
                           ReviewRepository reviewRepository
     ) {
         this.bookingRepository = bookingRepository;
         this.attractionBookingRepository = attractionBookingRepository;
         this.attractionRepository = attractionRepository;
+        this.hotelBookingRepository = hotelBookingRepository;
+        this.hotelRepository = hotelRepository;
         this.reviewStatsRepository = reviewStatsRepository;
         this.reviewRepository = reviewRepository;
     }

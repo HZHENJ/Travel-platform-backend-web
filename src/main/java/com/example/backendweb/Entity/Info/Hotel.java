@@ -27,7 +27,7 @@ public class Hotel {
     private Integer hotelId; // 酒店唯一标识
 
     @Column(nullable = false, unique = true)
-    private String uuid; // 景点唯一标识
+    private String uuid; // 酒店唯一标识
 
     @Column(length = 255)
     private String hotelName; // 酒店名称
