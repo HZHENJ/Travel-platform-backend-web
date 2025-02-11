@@ -16,8 +16,8 @@ import java.math.BigDecimal;
 @Data
 public class ReviewRequest {
     private Integer userId;
-    private String itemType; // Attraction
-    private Integer itemId;  // Attraction ID
+    private String itemType; // Attraction / Hotel
+    private Integer itemId;  // Attraction ID / Hotel ID
     private Integer bookingId; // booking Id
     private BigDecimal rating;
     private String comment;

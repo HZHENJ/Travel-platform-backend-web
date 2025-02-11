@@ -107,7 +107,7 @@ public class ReviewService {
 
     @Transactional
     public Review createReview(ReviewRequest request) {
-        // **Step 1: 查找现有 Review**
+        // Step 1: 查找现有 Review
         Optional<Review> existingReview = reviewRepository.findByBookingId(request.getBookingId());
 
         Review review;
@@ -133,7 +133,7 @@ public class ReviewService {
                     .build();
         }
 
-        reviewRepository.save(review); // 保存 Review**
+        reviewRepository.save(review); // 保存 Review
 
         // Step 2: 更新 ReviewStats
         Optional<ReviewStats> existingStats = reviewStatsRepository.findByItemIdAndItemType(
