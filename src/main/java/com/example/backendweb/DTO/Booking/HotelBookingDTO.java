@@ -20,9 +20,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HotelBookingDTO {
+    private Integer hotelBookingId;
     private Integer bookingId;
-    private String hotelName;
-    private String location;
+    private Integer hotelId;
+    private String hotelUuid;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private String roomType;

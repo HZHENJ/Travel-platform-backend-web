@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @ClassName AttractionBookingRepository
@@ -19,4 +20,6 @@ import java.util.List;
 public interface AttractionBookingRepository extends JpaRepository<AttractionBooking, Integer> {
     List<AttractionBooking> findByBookingIdIn(List<Integer> bookingIds);
     int countByAttractionId(Integer attractionId);
+    // 通过 bookingId 查找 AttractionBooking
+    Optional<AttractionBooking> findByBookingId(Integer bookingId);
 }

@@ -94,31 +94,39 @@ public class BookingService {
     }
 
     public List<HotelBookingDTO> getHotelBookingsByUserId(Integer userId) {
-        // 获取所有 `Booking` 记录
+        // 1. 查询该用户的所有 Booking
         List<Booking> userBookings = bookingRepository.findByUserIdAndBookingType(userId, Booking.BookingType.Hotel);
 
-        // 通过 `bookingId` 获取所有酒店预订
-        List<HotelBooking> hotelBookings = hotelBookingRepository.findByBookingIdIn(
-                userBookings.stream().map(Booking::getBookingId).collect(Collectors.toList())
-        );
+        // 2. 提取 bookingId
+        List<Integer> bookingIds = userBookings.stream()
+                .map(Booking::getBookingId)
+                .collect(Collectors.toList());
 
-        // 转换为 DTO
-        return hotelBookings.stream().map(booking -> {
-            Hotel hotel = hotelRepository.findById(booking.getHotelId()).orElse(null);
+        // 3. 查询所有酒店预订
+        List<HotelBooking> hotelBookings = hotelBookingRepository.findByBookingIdIn(bookingIds);
+
+        // 4. 通过 hotelId 查询 Hotel UUID
+        return hotelBookings.stream().map(hotelBooking -> {
+            String hotelUuid = hotelRepository.findById(hotelBooking.getHotelId())
+                    .map(Hotel::getUuid)
+                    .orElse(null); // 如果找不到酒店，返回 null
+
+            // 5. 获取对应的 Booking 记录
+            Booking booking = userBookings.stream()
+                    .filter(b -> b.getBookingId().equals(hotelBooking.getBookingId()))
+                    .findFirst()
+                    .orElse(null);
+
             return new HotelBookingDTO(
-                    booking.getBookingId(),
-                    hotel != null ? hotel.getHotelName() : "Unknown Hotel",
-                    hotel != null ? hotel.getLocation() : "Unknown Location",
-                    booking.getCheckInDate(),
-                    booking.getCheckOutDate(),
-                    booking.getRoomType(),
-                    booking.getGuests(),
-                    userBookings.stream()
-                            .filter(b -> b.getBookingId().equals(booking.getBookingId()))
-                            .findFirst()
-                            .map(b -> b.getTotalAmount() != null ? b.getTotalAmount().doubleValue() : null)
-                            // .map(Booking::getTotalAmount)
-                            .orElse(null)
+                    hotelBooking.getHotelBookingId(),
+                    hotelBooking.getBookingId(),
+                    hotelBooking.getHotelId(),
+                    hotelUuid,
+                    hotelBooking.getCheckInDate(),
+                    hotelBooking.getCheckOutDate(),
+                    hotelBooking.getRoomType(),
+                    hotelBooking.getGuests(),
+                    booking != null ? booking.getTotalAmount().doubleValue() : null // 确保转换为 Double
             );
         }).collect(Collectors.toList());
     }
@@ -255,5 +263,23 @@ public class BookingService {
         reviewRepository.save(review);
 
         return hotelBooking;
+    }
+
+    @Transactional
+    public void cancelAttractionBooking(Integer bookingId) {
+        // 查找 AttractionBooking
+        AttractionBooking attractionBooking = attractionBookingRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+
+        // 查找通用 Booking 记录
+        Booking booking = bookingRepository.findById(attractionBooking.getBookingId())
+                .orElseThrow(() -> new IllegalArgumentException("Booking record not found"));
+
+        // 更新 Booking 状态为 Canceled
+        booking.setStatus(Booking.BookingStatus.Canceled);
+        bookingRepository.save(booking);
+
+        // 删除 AttractionBooking 记录
+        // attractionBookingRepository.delete(attractionBooking);
     }
 }

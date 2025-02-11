@@ -23,7 +23,7 @@ public class AttractionBookingDTO {
     private Integer attractionBookingId;
     private Integer bookingId;
     private Integer attractionId;
-    private String attractionUuid;  // ✅ 这个是我们额外查询的字段
+    private String attractionUuid;
     private LocalDate visitDate;
     private LocalDateTime visitTime;
     private Integer numberOfTickets;
