@@ -60,6 +60,7 @@ public class RecommendationService {
         List<User> allUsers = userRepository.findAll();
         Map<Integer, Double> similarityScores = new HashMap<>();
 
+        // 计算相似用户
         for (User user : allUsers) {
             if (!user.getUserId().equals(userId)) {
                 double similarity = similarityService.calculateUserSimilarity(userId, user.getUserId());
@@ -67,39 +68,63 @@ public class RecommendationService {
             }
         }
 
-        // 找到用户已评分的景点
-        List<Review> userReviews = reviewRepository.findByUserId(userId);
+        // 找到用户已评分的景点（只包含 `status = show`）
+        List<Review> userReviews = reviewRepository.findByUserId(userId)
+                .stream()
+                .filter(r -> r.getItemType() == Review.ItemType.Attraction && r.getStatus() == Review.ReviewStatus.show)
+                .collect(Collectors.toList());
+
+        // 用户已访问的景点
         Set<Integer> visitedAttractions = userReviews.stream()
-                .filter(r -> r.getItemType() == Review.ItemType.Attraction)
                 .map(Review::getItemId)
                 .collect(Collectors.toSet());
 
         Map<Integer, Double> attractionScores = new HashMap<>();
+        Map<Integer, Integer> attractionReviewCounts = new HashMap<>(); // 计算每个景点的评分次数
 
+        // 遍历相似用户，计算推荐分数
         for (Map.Entry<Integer, Double> entry : similarityScores.entrySet()) {
             Integer otherUserId = entry.getKey();
             Double similarity = entry.getValue();
 
-            List<Review> otherUserReviews = reviewRepository.findByUserId(otherUserId);
+            // 获取相似用户的所有景点评价（只包含 `status = show`）
+            List<Review> otherUserReviews = reviewRepository.findByUserId(otherUserId)
+                    .stream()
+                    .filter(r -> r.getItemType() == Review.ItemType.Attraction && r.getStatus() == Review.ReviewStatus.show)
+                    .collect(Collectors.toList());
 
             for (Review review : otherUserReviews) {
-                if (review.getItemType() == Review.ItemType.Attraction && !visitedAttractions.contains(review.getItemId())) {
-                    // attractionScores.put(review.getItemId(),
-                    //         attractionScores.getOrDefault(review.getItemId(), 0.0)
-                    //                 + similarity * review.getRating().doubleValue());
-                    attractionScores.put(review.getItemId(),
-                            attractionScores.getOrDefault(review.getItemId(), 0.0) + (similarity * review.getRating().doubleValue()) / (1 + similarity));
+                int attractionId = review.getItemId();
+
+                // 排除用户已访问的景点
+                if (!visitedAttractions.contains(attractionId)) {
+                    attractionScores.put(
+                            attractionId,
+                            attractionScores.getOrDefault(attractionId, 0.0) + (similarity * review.getRating().doubleValue()) / (1 + similarity)
+                    );
+
+                    // 记录评分次数
+                    attractionReviewCounts.put(attractionId, attractionReviewCounts.getOrDefault(attractionId, 0) + 1);
                 }
             }
         }
 
+        // 计算平均评分
+        for (Integer attractionId : attractionScores.keySet()) {
+            if (attractionReviewCounts.containsKey(attractionId)) {
+                attractionScores.put(attractionId, attractionScores.get(attractionId) / attractionReviewCounts.get(attractionId));
+            }
+        }
+
+        // 返回推荐景点（按评分排序，取前 10 个）
         return attractionScores.entrySet().stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
-                .limit(3) // 取前10个个性化推荐
+                .limit(10)
                 .map(entry -> attractionRepository.findById(entry.getKey()).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
 
     /**
      * Comprehensive recommendations (combine popular and personalized recommendations)
