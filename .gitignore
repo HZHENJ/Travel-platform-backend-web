@@ -38,3 +38,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# github action
+.github/workflows/*.log
+.github/workflows/*.cache
+
+# dependency
+**/dependency/
+
