@@ -98,7 +98,7 @@ public class RecommendationService {
 
                 // 排除用户已访问的景点
                 if (!visitedAttractions.contains(attractionId)) {
-                    attractionScores.merge(attractionId, (similarity * review.getRating().doubleValue()) / (1 + similarity), Double::sum);
+                    attractionScores.merge(attractionId, similarity * review.getRating().doubleValue(), Double::sum);
                     attractionReviewCounts.merge(attractionId, 1, Integer::sum);
                 }
             }

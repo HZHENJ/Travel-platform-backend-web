@@ -29,26 +29,28 @@ public class SimilarityService {
     // Calculate the similarity between two users (based on cosine similarity)
     public double calculateUserSimilarity(Integer userId1, Integer userId2) {
 
-        // Get the rating data of two users
+        // 获取两个用户的评分数据
         List<Review> user1Reviews = reviewRepository.findByUserId(userId1);
         List<Review> user2Reviews = reviewRepository.findByUserId(userId2);
 
-        // Only calculate the rating similarity of attractions (Attraction) / Hotel
+        // 只计算景点 (Attraction) 评分相似度
         Map<Long, Double> user1Ratings = user1Reviews.stream()
                 .filter(r -> r.getItemType() == Review.ItemType.Attraction)
                 .collect(Collectors.toMap(
                         r -> r.getItemId().longValue(),
-                        r -> r.getRating().doubleValue()
+                        r -> r.getRating().doubleValue(),
+                        (oldValue, newValue) -> (oldValue + newValue) / 2 // 取平均值
                 ));
 
         Map<Long, Double> user2Ratings = user2Reviews.stream()
                 .filter(r -> r.getItemType() == Review.ItemType.Attraction)
                 .collect(Collectors.toMap(
                         r -> r.getItemId().longValue(),
-                        r -> r.getRating().doubleValue()
+                        r -> r.getRating().doubleValue(),
+                        (oldValue, newValue) -> (oldValue + newValue) / 2 // 取平均值
                 ));
 
-        // Directly call the CosineSimilarity tool class
+        // 调用余弦相似度计算
         return CosineSimilarity.calculate(user1Ratings, user2Ratings);
     }
 }
