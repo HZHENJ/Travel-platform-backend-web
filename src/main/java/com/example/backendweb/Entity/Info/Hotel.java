@@ -29,24 +29,22 @@ public class Hotel {
     @Column(nullable = false, unique = true)
     private String uuid; // 酒店唯一标识
 
-    @Column(length = 255)
     private String hotelName; // 酒店名称
 
-    @Column(length = 255)
     private String location; // 酒店位置
 
     @Column(columnDefinition = "TEXT")
     private String description; // 酒店描述
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json", nullable = false)
+    @Column(columnDefinition = "json")
     private Map<String, Double> roomType; // 房间类型及价格
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json", nullable = false)
+    @Column(columnDefinition = "json")
     private Map<String, String> amenities; // 酒店设施（如泳池、WiFi 等）
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json", nullable = false)
+    @Column(columnDefinition = "json")
     private Map<String, Integer> roomAvailability; // 各房型剩余数量
 }

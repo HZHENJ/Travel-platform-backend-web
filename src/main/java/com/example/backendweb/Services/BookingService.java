@@ -155,7 +155,14 @@ public class BookingService {
     public HotelBooking createHotelBooking(HotelBookingRequest request) {
         // Step 1: 确保 `Hotel` 存在
         Hotel hotel = hotelRepository.findByUuid(request.getUuid())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid hotel UUID: " + request.getUuid()));
+                // .orElseThrow(() -> new IllegalArgumentException("Invalid hotel UUID: " + request.getUuid()));
+                .orElseGet(() -> {
+                    Hotel newhotel = Hotel.builder()
+                            .uuid(request.getUuid())
+                            .build();
+                    return hotelRepository.save(newhotel);
+                });
+
 
         // // Step 2: 确保 `roomType` 存在
         // if (!hotel.getRoomType().containsKey(request.getRoomType())) {
