@@ -1,5 +1,6 @@
 package com.example.backendweb.Services;
 
+import com.example.backendweb.DTO.Review.ReviewWithUsernameDTO;
 import com.example.backendweb.Entity.Info.Attraction;
 import com.example.backendweb.DTO.AttractionDTO;
 import com.example.backendweb.Entity.Review.Review;
@@ -8,6 +9,7 @@ import com.example.backendweb.Repository.Review.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AttractionService {
@@ -79,6 +81,29 @@ public class AttractionService {
                 .orElseThrow(() -> new IllegalArgumentException("Attraction not found for UUID: " + uuid));
 
         // Step 2: 查询与该景点相关的评论
-        return reviewRepository.findByAttractionId(attraction.getAttractionId());
+        return reviewRepository.findByAttractionId(attraction.getAttractionId(), Review.ItemType.Attraction);
+    }
+
+    public List<ReviewWithUsernameDTO> getReviewsWithUsernameByUuid(String uuid) {
+        // Step 1: 根据 UUID 查询景点
+        Attraction attraction = attractionRepository.findByUuid(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("Attraction not found for UUID: " + uuid));
+
+        // Step 2: 查询与景点相关的评论和用户名
+        List<Object[]> rawResults = reviewRepository.findReviewsWithUsernamesByAttractionId(attraction.getAttractionId());
+
+        // Step 3: 转换为 DTO
+        return rawResults.stream()
+                .map(result -> {
+                    Review review = (Review) result[0];
+                    String username = (String) result[1];
+                    return new ReviewWithUsernameDTO(
+                            review.getReviewId(),
+                            username,
+                            review.getRating(),
+                            review.getComment()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 }

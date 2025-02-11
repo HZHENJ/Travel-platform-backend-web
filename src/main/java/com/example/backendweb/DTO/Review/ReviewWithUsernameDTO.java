@@ -1,24 +1,24 @@
 package com.example.backendweb.DTO.Review;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 /**
- * @ClassName ReviewRequest
+ * @ClassName ReviewWithUsernameDTO
  * @Description
  * @Author HUANG ZHENJIA
  * @StudentID A0298312B
- * @Date 2025/2/7
+ * @Date 2025/2/10
  * @Version 1.0
  */
 
 @Data
-public class ReviewRequest {
-    private Integer userId;
-    private String itemType; // Attraction
-    private Integer itemId;  // Attraction ID
-    private Integer bookingId; // booking Id
+@AllArgsConstructor
+public class ReviewWithUsernameDTO {
+    private Integer reviewId;
+    private String username;
     private BigDecimal rating;
     private String comment;
 }

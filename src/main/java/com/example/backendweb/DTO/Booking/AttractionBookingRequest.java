@@ -26,5 +26,5 @@ public class AttractionBookingRequest {
     private LocalDate visitDate;        // 参观日期
     private LocalDateTime visitTime;    // 参观时间
     private Integer numberOfTickets;    // 预订门票数量
-    private Double price;      // 价格
+    private Double price;               // 价格
 }

@@ -68,12 +68,4 @@ public class ReviewController {
             return ResponseEntity.badRequest().body("Review failed: " + e.getMessage());
         }
     }
-
-    // 检查用户是否已经评论
-    @GetMapping("/check")
-    public ResponseEntity<?> checkUserReview(@RequestParam Integer userId, @RequestParam Integer itemId) {
-        boolean exists = reviewService.hasUserReviewed(userId, itemId);
-        return ResponseEntity.ok().body(Map.of("exists", exists));
-    }
-
 }
