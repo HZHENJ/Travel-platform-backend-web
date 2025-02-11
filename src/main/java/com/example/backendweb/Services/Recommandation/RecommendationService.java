@@ -116,10 +116,10 @@ public class RecommendationService {
             }
         }
 
-        // 返回推荐景点（按评分排序，取前 10 个）
+        // 返回推荐景点（按评分排序，取前 3个）
         return attractionScores.entrySet().stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
-                .limit(10)
+                .limit(3)
                 .map(entry -> attractionRepository.findById(entry.getKey()).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
