@@ -1,13 +1,4 @@
-name: DAST Scan
-
 on:
-  push:
-    branches:
-      - main  # Trigger when pushing to main branch
-  pull_request:
-    branches:
-      - main  # Trigger on pull request to main branch
-
 jobs:
   dast-scan:
     runs-on: ubuntu-latest
@@ -21,6 +12,11 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
       - name: Build Spring Boot Application
         run: |
