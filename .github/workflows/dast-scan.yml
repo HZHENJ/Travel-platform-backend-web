@@ -3,10 +3,10 @@ name: DAST Scan
 on:
   push:
     branches:
-      - main  # Trigger when pushing to main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on pull request to main branch
+      - main
 
 jobs:
   dast-scan:
@@ -27,12 +27,19 @@ jobs:
 
       - name: Build Spring Boot Application
         run: |
-          mvn clean package -DskipTests  # Build the JAR file
+          mvn clean package -DskipTests
 
       - name: Start Docker Compose
         run: |
-          docker-compose up -d  # Start Spring Boot container
-          sleep 30  # Wait 30 seconds for the service to be ready
+          docker-compose up -d
+          sleep 30
+          docker ps -a
+
+      - name: Check Docker Logs
+        run: docker logs springboot-app
+
+      - name: Test if Application is Running
+        run: curl -I http://localhost:8080 || exit 1
 
       - name: Run OWASP ZAP DAST Scan
         uses: zaproxy/action-full-scan@v0.6.0
@@ -49,5 +56,3 @@ jobs:
       - name: Stop Docker Compose
         if: always()
         run: docker-compose down
-
-
