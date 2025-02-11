@@ -1,4 +1,4 @@
-package com.example.backendweb.Services;
+package com.example.backendweb.Services.User;
 
 
 import com.example.backendweb.Repository.User.AuthenticationRepository;

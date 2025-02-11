@@ -1,13 +1,13 @@
 package com.example.backendweb.Controller.Booking;
 
+import com.example.backendweb.DTO.Booking.AttractionBookingDTO;
 import com.example.backendweb.DTO.Booking.HotelBookingRequest;
 import com.example.backendweb.Entity.Booking.HotelBooking;
 import com.example.backendweb.Services.BookingService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @ClassName HotelBookingController

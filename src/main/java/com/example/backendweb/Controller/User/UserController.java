@@ -1,4 +1,4 @@
-package com.example.backendweb.Controller;
+package com.example.backendweb.Controller.User;
 
 import com.example.backendweb.DTO.User.LoginResponse;
 import com.example.backendweb.DTO.User.UserLoginRequest;
@@ -6,12 +6,10 @@ import com.example.backendweb.DTO.User.UserRegistrationRequest;
 import com.example.backendweb.Entity.User.Authentication;
 import com.example.backendweb.Entity.User.Preference;
 import com.example.backendweb.Entity.User.User;
-import com.example.backendweb.Services.UserService;
+import com.example.backendweb.Services.User.UserService;
 import com.example.backendweb.Util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 /**
  * @ClassName UserController
@@ -79,6 +77,8 @@ public class UserController {
                         auth.getRole().name()
                 ));
     }
+
+
 
 }
 
