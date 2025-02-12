@@ -37,8 +37,8 @@ jobs:
           mkdir -p zap-reports && chmod -R 777 zap-reports
           docker run --rm --user root -v $(pwd)/zap-reports:/zap/wrk zaproxy/zap-stable \
           zap-baseline.py -t "$EC2_HOST" -r /zap/wrk/zap_baseline_report.html \
-          -z "-config scanner.pscan.rules.disabled=10049" \
-          -z "-config spider.exclude.regex='.*(robots\.txt|sitemap\.xml).*'" || true
+          -J /zap/wrk/zap_out.json \
+          --hook=/zap/wrk/custom_hooks.py || true
           
           ls -l zap-reports/
 
