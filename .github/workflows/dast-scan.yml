@@ -24,16 +24,25 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      - name: Check EC2_HOST Variable
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then
+            echo "Error: EC2_HOST is empty!"
+            exit 1
+          fi
+
       - name: Docker login
         run: echo "${{ secrets.DOCKER_HUB_PASS }}" | docker login -u "${{ secrets.DOCKER_HUB_USER }}" --password-stdin
 
       - name: Pull OWASP ZAP Docker Image
         run: docker pull zaproxy/zap-stable
 
-      - name: Create Custom Hook Script
+      - name: Ensure zap-scripts directory exists
         run: |
+          mkdir -p zap-scripts
+          ls -l zap-scripts/
 
-      - name: Run OWASP ZAP Scan
+      - name: Run OWASP ZAP Baseline Scan
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
@@ -46,8 +55,13 @@ jobs:
           -J /zap/wrk/zap_out.json \
           --hook=/zap-scripts/custom_hooks.py \
           -z "-config spider.maxDepth=5" \
-          -z "-config connection.userAgent=Mozilla/5.0" || true
-          ls -l zap-reports/
+          -z "-config spider.threadCount=5" \
+          -z "-config connection.userAgent=Mozilla/5.0" \
+          -z "-config ascan.attackStrength=HIGH" \
+          -z "-config ascan.policy=Default Policy" || true
+          
+          ls -lh zap-reports/
+          cat zap-reports/zap_out.json
 
       - name: Upload ZAP Scan Report
         uses: actions/upload-artifact@v4
