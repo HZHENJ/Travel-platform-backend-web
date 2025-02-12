@@ -1,12 +1,14 @@
-# 选择基础镜像，确保版本与本地 Java 版本一致
-FROM openjdk:17
+# 使用 OpenJDK 官方镜像作为基础镜像
+FROM openjdk:17-jdk-slim
+
+# 设置工作目录
 WORKDIR /app
 
-# 复制 Spring Boot 打包的 JAR 文件到容器
+# 将构建的 JAR 文件复制到容器中
 COPY target/*.jar app.jar
 
-# 容器暴露 8080 端口
+# 暴露 Spring Boot 默认端口（根据实际项目修改）
 EXPOSE 8080
 
-# 运行 Spring Boot 应用
-CMD ["java", "-jar", "app.jar"]
+# 启动命令
+ENTRYPOINT ["java", "-jar", "app.jar"]
