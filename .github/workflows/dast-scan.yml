@@ -23,7 +23,7 @@ jobs:
 
       - name: Run OWASP ZAP Baseline Scan on API
         run: |
-          docker run --rm --user root -v $(pwd)/zap-wrk:/zap/wrk zaproxy/zap-stable \
+          docker run --rm -v $(pwd):/zap/wrk zaproxy/zap-stable \
           zap-baseline.py -t http://18.143.182.252:8080/api -r /zap/wrk/zap-report.html || true
 
       - name: Upload Scan Report
