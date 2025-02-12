@@ -34,18 +34,12 @@ jobs:
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
-          mkdir -p zap-reports
-          docker run --rm --user root \
-            -v $(pwd)/zap-reports:/zap/wrk \
-            zaproxy/zap-stable zap-baseline.py -t "$EC2_HOST" -r /zap/wrk/zap_baseline_report.html || true
+          chmod +x scripts/zap-script.sh   # Make sure the script is executable
+          ./scripts/zap-script.sh         # Execute the ZAP script
 
-          echo "Checking generated report..."
-          ls -l zap-reports/
-
-      - name: Upload ZAP Scan Report
+      # Upload the ZAP report as an artifact for later review
+      - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          name: zap-scan-report
-          path: zap-reports/zap_baseline_report.html
-          retention-days: 5
-          if-no-files-found: warn
+          name: zap-report
+          path: ./zap_baseline_report.html
