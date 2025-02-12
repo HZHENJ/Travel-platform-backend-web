@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 /**
  * @ClassName Review
- * @Description
+ * @Description Review entity with additional reply functionality
  * @Author HUANG ZHENJIA
  * @StudentID A0298312B
  * @Date 2025/1/25
@@ -24,36 +24,38 @@ import java.time.LocalDateTime;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer reviewId; // 评论唯一标识 (Primary Key)
+    private Integer reviewId; // Primary Key
 
     @Column(nullable = false)
-    private Integer userId; // 用户ID (外键)
+    private Integer userId; // User ID (Foreign Key)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ItemType itemType; // 评价对象类型 (酒店或景点)
+    private ItemType itemType; // Item Type (Flight, Hotel, or Attraction)
 
     @Column(nullable = false)
-    private Integer itemId; // 评价对象ID (酒店ID、景点ID)
-
-    @Column(nullable = false)
-    private Integer bookingId; // 一个booking对应一条review
+    private Integer itemId; // Item ID (Flight ID, Hotel ID, or Attraction ID)
 
     @Column(nullable = false, precision = 2, scale = 1)
-    private BigDecimal rating; // 评分
+    private BigDecimal rating; // Rating
 
     @Column(columnDefinition = "TEXT")
-    private String comment; // 评论内容
+    private String comment; // Review Comment
+
+    @Column(columnDefinition = "TEXT")
+    private String reply; // Admin Reply
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ReviewStatus status; // 评论状态 (显示或隐藏)
+    private ReviewStatus status; // Review Status (show or hide)
 
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt; // 创建时间
+    @Column(nullable = false, updatable = false, insertable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt; // Created Time
 
-    @Column(nullable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private LocalDateTime updatedAt; // 更新时间
+    @Column(nullable = false, insertable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    private LocalDateTime updatedAt; // Updated Time
 
     public enum ItemType {
         Flight, Hotel, Attraction
@@ -63,4 +65,36 @@ public class Review {
         hide, show
     }
 
+    // Custom constructor with required fields
+    public Review(Integer userId, ItemType itemType, Integer itemId,
+                  BigDecimal rating, String comment) {
+        this.userId = userId;
+        this.itemType = itemType;
+        this.itemId = itemId;
+        this.rating = rating;
+        this.comment = comment;
+        this.status = ReviewStatus.show; // Default status
+    }
+
+    // Helper method to add or update reply
+    public void addReply(String reply) {
+        this.reply = reply;
+    }
+
+    // Helper method to toggle status
+    public void toggleStatus() {
+        this.status = (this.status == ReviewStatus.show) ?
+                ReviewStatus.hide : ReviewStatus.show;
+    }
+
+    // Helper method to update review
+    public void updateReview(BigDecimal rating, String comment) {
+        this.rating = rating;
+        this.comment = comment;
+    }
+
+    // Helper method to check if review has reply
+    public boolean hasReply() {
+        return reply != null && !reply.trim().isEmpty();
+    }
 }

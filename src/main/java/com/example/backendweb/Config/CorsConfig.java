@@ -31,7 +31,7 @@ public class CorsConfig {
                         // 允许的请求头
                         .allowedHeaders("*")
                         // 是否允许发送 Cookie 等凭证信息，若允许则设置为 true
-                        .allowCredentials(false)
+                        .allowCredentials(true)
                         // 预检请求的缓存时间（秒）
                         .maxAge(3600);
             }

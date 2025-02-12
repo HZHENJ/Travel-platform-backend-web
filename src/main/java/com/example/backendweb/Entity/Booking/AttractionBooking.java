@@ -1,10 +1,10 @@
 package com.example.backendweb.Entity.Booking;
 
+import com.example.backendweb.Entity.Info.Attraction;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * @ClassName AttractionBooking
@@ -26,6 +26,10 @@ public class AttractionBooking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer attractionBookingId; // 景点预订唯一标识 (Primary Key)
 
+    @ManyToOne  // Define the relationship
+    @JoinColumn(name = "attractionId", referencedColumnName = "attractionId", insertable = false, updatable = false) // Specify the join column
+    private Attraction attraction;
+
     @Column(nullable = true)
     private Integer bookingId; // 预订ID (外键)
 
@@ -35,10 +39,7 @@ public class AttractionBooking {
     @Column(nullable = false)
     private LocalDate visitDate; // 参观日期
 
-    @Column(nullable = false)
-    private LocalDateTime visitTime; // 参观时间
-
-    @Column(length = 50)
+    @Column(nullable = false, length = 50)
     private String ticketType; // 门票类型
 
     @Column(nullable = false)
