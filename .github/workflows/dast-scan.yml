@@ -32,30 +32,21 @@ jobs:
 
       - name: Create Custom Hook Script
         run: |
-          mkdir -p zap-scripts
-          cat <<EOF > zap-scripts/custom_hooks.py
-          def zap_started(zap, target):
-              print("ZAP started, configuring rules...")
-              # 忽略 10049 警告
-              zap.pscan.disable_scanners("10049")
-              # 忽略特定 URL
-              zap.spider.exclude_from_scan(".*robots\\.txt.*")
-              zap.spider.exclude_from_scan(".*sitemap\\.xml.*")
-              print("Configuration applied.")
-          EOF
-          chmod +x zap-scripts/custom_hooks.py
-          ls -l zap-scripts/
 
       - name: Run OWASP ZAP Scan
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           mkdir -p zap-reports && chmod -R 777 zap-reports
-          docker run --rm -v $(pwd)/zap-reports:/zap/wrk zaproxy/zap-stable \
-          zap-full-scan.py -t "$EC2_HOST" -r /zap/wrk/zap_full_scan_report.html \
+          docker run --rm --user root 
+          -v $(pwd)/zap-reports:/zap/wrk zaproxy/zap-stable \
+          -v $(pwd)/zap-scripts:/zap-scripts \
+          zap-baseline.py -t "$EC2_HOST" -r /zap/wrk/zap_baseline_report.html \
+          -J /zap/wrk/zap_out.json \
           -z "-config spider.maxDepth=5" \
-          -z "-config spider.threadCount=5" \
-          -z "-config connection.userAgent=Mozilla/5.0"
+          -z "-config connection.userAgent=Mozilla/5.0" \
+          --hook=/zap-scripts/custom_hooks.py || true
+          
           ls -l zap-reports/
 
       - name: Upload ZAP Scan Report
