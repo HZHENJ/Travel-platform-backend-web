@@ -23,7 +23,7 @@ jobs:
 
       - name: Run OWASP ZAP Baseline Scan on EC2
         run: |
-          docker run --rm -t zaproxy/zap-stable zap-baseline.py -t http://18.143.182.25:8080 -r zap-report.html || true
+          docker run --rm -v $(pwd):/zap/wrk zaproxy/zap-stable zap-baseline.py -t http://18.143.182.25:8080 -r /zap/wrk/zap-report.html || true
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
@@ -31,6 +31,7 @@ jobs:
           name: zap-scan-report
           path: zap-report.html
           retention-days: 5
+          if-no-files-found: warn
 
       - name: Fail if High-Risk Issues Found
         run: |
