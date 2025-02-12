@@ -2,9 +2,11 @@ package com.example.backendweb.Services;
 
 import com.example.backendweb.DTO.Booking.AttractionBookingDTO;
 import com.example.backendweb.DTO.Booking.AttractionBookingRequest;
+import com.example.backendweb.DTO.Booking.FlightBookingRequest;
 import com.example.backendweb.DTO.Booking.HotelBookingRequest;
 import com.example.backendweb.Entity.Booking.AttractionBooking;
 import com.example.backendweb.Entity.Booking.Booking;
+import com.example.backendweb.Entity.Booking.FlightBooking;
 import com.example.backendweb.Entity.Booking.HotelBooking;
 import com.example.backendweb.Entity.Info.Attraction;
 import com.example.backendweb.Entity.Info.Hotel;
@@ -13,16 +15,17 @@ import com.example.backendweb.Entity.Review.ReviewStats;
 import com.example.backendweb.Repository.AttractionRepository;
 import com.example.backendweb.Repository.Booking.AttractionBookingRepository;
 import com.example.backendweb.Repository.Booking.BookingRepository;
+import com.example.backendweb.Repository.Booking.FlightBookingRepository;
 import com.example.backendweb.Repository.Booking.HotelBookingRepository;
 import com.example.backendweb.Repository.HotelRepository;
 import com.example.backendweb.Repository.Review.ReviewRepository;
 import com.example.backendweb.Repository.Review.ReviewStatsRepository;
+import com.example.backendweb.Repository.User.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +47,8 @@ public class BookingService {
     private final HotelRepository hotelRepository;
     private final ReviewStatsRepository reviewStatsRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
+    private final FlightBookingRepository flightBookingRepository;
 
     public BookingService(BookingRepository bookingRepository,
                           AttractionBookingRepository attractionBookingRepository,
@@ -51,7 +56,7 @@ public class BookingService {
                           HotelBookingRepository hotelBookingRepository,
                           HotelRepository hotelRepository,
                           ReviewStatsRepository reviewStatsRepository,
-                          ReviewRepository reviewRepository
+                          ReviewRepository reviewRepository, UserRepository userRepository, FlightBookingRepository flightBookingRepository
     ) {
         this.bookingRepository = bookingRepository;
         this.attractionBookingRepository = attractionBookingRepository;
@@ -60,6 +65,8 @@ public class BookingService {
         this.hotelRepository = hotelRepository;
         this.reviewStatsRepository = reviewStatsRepository;
         this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
+        this.flightBookingRepository = flightBookingRepository;
     }
 
     public List<AttractionBookingDTO> getAttractionBookingsByUserId(Integer userId) {
@@ -108,7 +115,7 @@ public class BookingService {
                 .userId(request.getUserId())
                 .bookingType(Booking.BookingType.Attraction)
                 .status(Booking.BookingStatus.Pending)
-                .totalAmount(new BigDecimal(request.getPrice()))
+                .totalAmount(BigDecimal.valueOf(request.getPrice()))
                 .build();
         booking = bookingRepository.save(booking);
 
@@ -182,7 +189,7 @@ public class BookingService {
                 .userId(request.getUserId())
                 .bookingType(Booking.BookingType.Hotel)
                 .status(Booking.BookingStatus.Pending)
-                .totalAmount(new BigDecimal(request.getPrice()))
+                .totalAmount(BigDecimal.valueOf(request.getPrice()))
                 .build();
         booking = bookingRepository.save(booking);
 
@@ -224,5 +231,29 @@ public class BookingService {
         reviewRepository.save(review);
 
         return hotelBooking;
+    }
+
+    public FlightBooking createFlightBooking(FlightBookingRequest request) {
+        // 创建通用 Booking 记录
+        Booking booking = Booking.builder()
+                .userId(Math.toIntExact(request.getUserId()))
+                .bookingType(Booking.BookingType.Flight)
+                .status(Booking.BookingStatus.Pending)
+                .totalAmount(BigDecimal.valueOf(request.getTotalPrice()))
+                .build();
+        bookingRepository.save(booking);
+
+        // 创建具体的 FlightBooking 记录
+        FlightBooking flightBooking = FlightBooking.builder()
+                .bookingId(booking.getBookingId())
+                .flightId(request.getId())
+                .seatClass(FlightBooking.SeatClass.valueOf(request.getSelectedSeats().toUpperCase()))
+                .passengerId(request.getUserId().toString())
+                .passengerName(userRepository.findById(Math.toIntExact(request.getUserId())).get().getName())
+                .build();
+
+        flightBookingRepository.save(flightBooking);
+
+        return flightBooking;
     }
 }

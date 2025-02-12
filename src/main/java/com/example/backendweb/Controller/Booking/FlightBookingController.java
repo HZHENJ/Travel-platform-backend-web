@@ -1,0 +1,23 @@
+package com.example.backendweb.Controller.Booking;
+
+import com.example.backendweb.DTO.Booking.FlightBookingRequest;
+import com.example.backendweb.Entity.Booking.FlightBooking;
+import com.example.backendweb.Services.BookingService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController(("/api/flights"))
+public class FlightBookingController {
+
+    private final BookingService bookingService;
+
+    public FlightBookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+
+    @PostMapping("/booking")
+    public ResponseEntity<FlightBooking> createFlightBooking(FlightBookingRequest request) {
+        return ResponseEntity.ok(bookingService.createFlightBooking(request));
+    }
+}
