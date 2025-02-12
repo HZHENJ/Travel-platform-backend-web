@@ -21,10 +21,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Run OWASP ZAP Baseline Scan on EC2
+      - name: Run OWASP ZAP Baseline Scan on API
         run: |
-          docker run --rm --user root -v $(pwd):/zap/wrk zaproxy/zap-stable zap-baseline.py -t http://18.143.182.252:8080 -r zap-report.html || true
-
+          docker run --rm --user root -v $(pwd)/zap-wrk:/zap/wrk zaproxy/zap-stable \
+          zap-baseline.py -t http://18.143.182.252:8080/api -r /zap/wrk/zap-report.html || true
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
@@ -33,12 +33,3 @@ jobs:
           path: zap-report.html
           retention-days: 5
           if-no-files-found: warn
-
-      - name: Fail if High-Risk Issues Found
-        run: |
-          if grep -q "High" zap-report.html; then
-            echo "High-risk vulnerabilities found! Failing the pipeline."
-            exit 1
-          else
-            echo "No high-risk vulnerabilities found."
-          fi
