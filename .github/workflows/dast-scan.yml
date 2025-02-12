@@ -38,15 +38,15 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           mkdir -p zap-reports && chmod -R 777 zap-reports
-          docker run --rm --user root 
-          -v $(pwd)/zap-reports:/zap/wrk zaproxy/zap-stable \
+          docker run --rm --user root \
+          -v $(pwd)/zap-reports:/zap/wrk \
           -v $(pwd)/zap-scripts:/zap-scripts \
+          zaproxy/zap-stable \
           zap-baseline.py -t "$EC2_HOST" -r /zap/wrk/zap_baseline_report.html \
           -J /zap/wrk/zap_out.json \
+          --hook=/zap-scripts/custom_hooks.py \
           -z "-config spider.maxDepth=5" \
-          -z "-config connection.userAgent=Mozilla/5.0" \
-          --hook=/zap-scripts/custom_hooks.py || true
-          
+          -z "-config connection.userAgent=Mozilla/5.0" || true
           ls -l zap-reports/
 
       - name: Upload ZAP Scan Report
