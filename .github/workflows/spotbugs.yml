@@ -1,0 +1,48 @@
+name: SAST and DAST Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  sast:
+    name: Static Application Security Testing (SAST) with SpotBugs
+    runs-on: ubuntu-latest
+
+    steps:
+      # 检出代码
+      - name: Checkout Code
+        uses: actions/checkout@v4.0.0
+
+      # 设置 Java 和 Maven 环境
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v4.0.0
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Install dependencies and skip tests
+        run: mvn clean install -DskipTests=true
+
+      # 4. 运行 SpotBugs 并生成报告（HTML & XML）
+      - name: Run SpotBugs
+        run: mvn spotbugs:spotbugs -Dspotbugs.xmlOutput=true -Dspotbugs.htmlOutput=true
+
+      # 5. 上传 SpotBugs 生成的 HTML 和 XML 报告
+      - name: Upload SpotBugs Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-report
+          path: target/spotbugsXml.xml
+
+      - name: Upload SpotBugs HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-html-report
+          path: target/site/spotbugs.html
