@@ -36,7 +36,6 @@ jobs:
           docker run --rm --user root -v $(pwd)/zap-reports:/zap/wrk \
           -v $(pwd)/zap-scripts:/zap/scripts zaproxy/zap-stable \
           zap-full-scan.py -t "http://18.143.182.252:8080" \
-#          --hook /zap/scripts/post_request.py \
           -r /zap/wrk/zap-report.html || true
 
           echo "Checking generated report..."
