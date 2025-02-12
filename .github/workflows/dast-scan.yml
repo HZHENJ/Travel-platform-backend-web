@@ -23,7 +23,8 @@ jobs:
 
       - name: Run OWASP ZAP Baseline Scan on EC2
         run: |
-          docker run --rm --user root -v $(pwd):/zap/wrk zaproxy/zap-stable zap-baseline.py -t http://18.143.182.252:8080 -r /zap/wrk/zap-report.html || true
+          docker run --rm -v $(pwd):/zap/wrk zaproxy/zap-stable zap-baseline.py -t http://18.143.182.252:8080 -r zap-report.html || true
+
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
