@@ -46,3 +46,5 @@ build/
 # dependency
 **/dependency/
 
+springboot-app.tar
+
