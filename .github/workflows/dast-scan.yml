@@ -1,4 +1,4 @@
-name: DAST Security Scan
+name: "ZAP DAST Security Scan"
 
 on:
   push:
@@ -30,15 +30,15 @@ jobs:
       - name: Pull OWASP ZAP Docker Image
         run: docker pull zaproxy/zap-stable
 
-      - name: Run OWASP ZAP API Scan
+      - name: Run OWASP ZAP with Config
         run: |
           docker run --rm --user root -v $(pwd):/zap/wrk zaproxy/zap-stable \
-          zap-api-scan.py -t http://18.143.182.252:8080/api/auth/register -r /zap/wrk/zap-report.html || true
+          zap-cli quick-scan -c .github/workflows/zap-config.yaml -r /zap/wrk/zap-report.html || true
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-scan-report
-          path: zap-wrk/zap-report.html
+          path: /zap/wrk/zap-report.html
           retention-days: 5
           if-no-files-found: warn
