@@ -30,15 +30,22 @@ jobs:
       - name: Pull OWASP ZAP Docker Image
         run: docker pull zaproxy/zap-stable
 
-      - name: Run OWASP ZAP with Config
+      - name: Run OWASP ZAP with POST Request
         run: |
-          docker run --rm --user root -v $(pwd):/zap/wrk zaproxy/zap-stable \
-          zap-cli quick-scan -c .github/workflows/zap-config.yaml -r /zap/wrk/zap-report.html || true
+          mkdir -p zap-reports
+          docker run --rm --user root -v $(pwd)/zap-reports:/zap/wrk \
+          -v $(pwd)/zap-scripts:/zap/scripts zaproxy/zap-stable \
+          zap-full-scan.py -t "http://18.143.182.252:8080/api/auth/register" \
+          --hook /zap/scripts/post_request.py \
+          -r /zap/wrk/zap-report.html || true
+
+          echo "Checking generated report..."
+          ls -l zap-reports/
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-scan-report
-          path: /zap/wrk/zap-report.html
+          path: zap-reports/zap-report.html
           retention-days: 5
           if-no-files-found: warn
