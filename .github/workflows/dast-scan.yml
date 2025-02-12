@@ -36,8 +36,10 @@ jobs:
         run: |
           mkdir -p zap-reports && chmod -R 777 zap-reports
           docker run --rm --user root -v $(pwd)/zap-reports:/zap/wrk zaproxy/zap-stable \
-          zap-baseline.py -t "$EC2_HOST" -r /zap/wrk/zap_baseline_report.html -z \
-          "pscan.disable 10049; spider.exclude $EC2_HOST/robots.txt $EC2_HOST/sitemap.xml" || true
+          zap-baseline.py -t "$EC2_HOST" -r /zap/wrk/zap_baseline_report.html \
+          -z "-config scanner.pscan.rules.disabled=10049" \
+          -z "-config spider.exclude.regex='.*(robots\.txt|sitemap\.xml).*'" || true
+          
           ls -l zap-reports/
 
       - name: Upload ZAP Scan Report
