@@ -1,0 +1,20 @@
+# ZAP 配置文件
+parameters:
+  target: "http://18.143.182.252:8080/api/auth/register"
+  rules_file: "zap-rules.txt"
+
+scan:
+  - name: "API Auth Register Scan"
+    request:
+      method: "POST"
+      url: "http://18.143.182.252:8080/api/auth/register"
+      headers:
+        Content-Type: "application/json"
+      body: >
+        {
+          "email": "b@qq.com",
+          "password": "123"
+        }
+    assertions:
+      - response_code: 200
+      - max_response_time: 5000
