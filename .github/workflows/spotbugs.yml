@@ -30,19 +30,13 @@ jobs:
       - name: Install dependencies and skip tests
         run: mvn clean install -DskipTests=true
 
-      # 4. 运行 SpotBugs 并生成报告（HTML & XML）
+      # 安装依赖并运行 SpotBugs
       - name: Run SpotBugs
-        run: mvn spotbugs:spotbugs -Dspotbugs.xmlOutput=true -Dspotbugs.htmlOutput=true
-
-      # 5. 上传 SpotBugs 生成的 HTML 和 XML 报告
+        run: |
+          mvn spotbugs:spotbugs -DskipTests=true
+      # 保存 SpotBugs 报告到 GitHub Actions 工作流的结果
       - name: Upload SpotBugs Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.0.0
         with:
           name: spotbugs-report
-          path: target/spotbugsXml.xml
-
-      - name: Upload SpotBugs HTML Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: spotbugs-html-report
-          path: target/site/spotbugs.html
+          path: target/
