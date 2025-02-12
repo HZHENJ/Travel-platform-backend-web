@@ -12,7 +12,7 @@ scan:
         Content-Type: "application/json"
       body: >
         {
-          "email": "b@qq.com",
+          "email": "d@qq.com",
           "password": "123"
         }
     assertions:
