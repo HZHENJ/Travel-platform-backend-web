@@ -34,17 +34,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Wait for MySQL
-        run: |
-          until mysqladmin ping -h 127.0.0.1 -uroot -proot --silent; do
-            echo "Waiting for MySQL..."
-            sleep 2
-          done
-          echo "MySQL is ready!"
-
-      - name: Verify MySQL Connection
-        run: |
-          mysql -h 127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
+#      - name: Wait for MySQL
+#        run: |
+#          until mysqladmin ping -h 127.0.0.1 -uroot -proot --silent; do
+#            echo "Waiting for MySQL..."
+#            sleep 2
+#          done
+#          echo "MySQL is ready!"
+#
+#      - name: Verify MySQL Connection
+#        run: |
+#          mysql -h 127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
 
       - name: Build & Test Spring Boot
         run: |
