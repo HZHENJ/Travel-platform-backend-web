@@ -20,10 +20,11 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -34,17 +35,18 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-#      - name: Wait for MySQL
-#        run: |
-#          until mysqladmin ping -h 127.0.0.1 -uroot -proot --silent; do
-#            echo "Waiting for MySQL..."
-#            sleep 2
-#          done
-#          echo "MySQL is ready!"
-#
-#      - name: Verify MySQL Connection
-#        run: |
-#          mysql -h 127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
+      - name: Wait for MySQL
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          until mysqladmin ping -h 127.0.0.1 -uroot -prootpassword --silent; do
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+          echo "MySQL is ready!"
+
+      - name: Verify MySQL Connection
+        run: |
+          mysql -h 127.0.0.1 -uroot -prootpassword -e "SHOW DATABASES;"
 
       - name: Build & Test Spring Boot
         run: |
@@ -66,8 +68,8 @@ jobs:
       - name: Build & Tag Docker Images
         run: |
           docker-compose build
-          docker tag ad-project_springboot ${{ secrets.DOCKER_HUB_USER }}/springboot-app:latest
-          docker tag ad-project_frontend ${{ secrets.DOCKER_HUB_USER }}/frontend-app:latest
+          docker tag my-springboot-app ${{ secrets.DOCKER_HUB_USER }}/springboot-app:latest
+          docker tag my-frontend-app ${{ secrets.DOCKER_HUB_USER }}/frontend-app:latest
 
       - name: Push Docker Images
         run: |
@@ -92,7 +94,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             cd ~/AD-Project
-            git pull origin main
+            git pull https://github.com/${{ github.repository }}.git
             docker-compose down
             docker-compose pull
             docker-compose up --build -d
