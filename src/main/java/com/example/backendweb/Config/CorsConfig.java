@@ -43,7 +43,9 @@ public class CorsConfig {
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             return new String[]{
                     "http://localhost:5173", // 默认本地开发
-                    "http://18.142.51.29"};
+                    "http://18.142.51.29:8081",
+                    "http://18.142.51.29",
+            };
         }
         return allowedOrigins.split(",");
     }
