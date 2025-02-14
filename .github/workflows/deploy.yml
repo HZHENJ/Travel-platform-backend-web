@@ -1,0 +1,64 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v3
+
+      - name: 编译 Spring Boot 应用
+        run: mvn clean package -DskipTests
+
+      - name: 上传 `setup_mysql.sh` 到 EC2（自动安装 MySQL）
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "setup_mysql.sh"
+          target: "~/backend-web/setup_mysql.sh"
+
+      - name: 运行 `setup_mysql.sh`
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            chmod +x ~/backend-web/setup_mysql.sh
+            ~/backend-web/setup_mysql.sh
+
+      - name: 上传 `deploy.sh` 到 EC2（自动启动后端）
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "deploy.sh"
+          target: "~/backend-web/deploy.sh"
+
+      - name: 上传 `backend.jar`
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "target/backend.jar"
+          target: "~/backend-web/backend.jar"
+
+      - name: 运行 `deploy.sh`
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            chmod +x ~/backend-web/deploy.sh
+            ~/backend-web/deploy.sh
