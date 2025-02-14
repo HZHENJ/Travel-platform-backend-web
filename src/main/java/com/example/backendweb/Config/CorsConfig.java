@@ -42,7 +42,7 @@ public class CorsConfig {
         String allowedOrigins = System.getenv("ALLOWED_ORIGINS"); // 读取环境变量
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             return new String[]{
-                    "http://localhost:5173", // 默认本地开发
+                    "http://localhost:5173",
                     "http://13.229.230.185:8081",
                     "http://13.229.230.185",
             };
