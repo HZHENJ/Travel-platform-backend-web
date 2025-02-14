@@ -30,6 +30,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "./target/backend-web-0.0.1-SNAPSHOT.jar"
           target: "~/backend-web/backend.jar"
+          overwrite: true
 
       - name: 运行 `deploy.sh`
         uses: appleboy/ssh-action@master
