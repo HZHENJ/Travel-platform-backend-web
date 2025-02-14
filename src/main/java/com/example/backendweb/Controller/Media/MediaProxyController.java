@@ -20,7 +20,7 @@ import java.io.IOException;
  */
 
 @RestController
-@RequestMapping("/proxy/media")
+@RequestMapping("/api/proxy/media")
 public class MediaProxyController {
 
     private final MediaService mediaService;
