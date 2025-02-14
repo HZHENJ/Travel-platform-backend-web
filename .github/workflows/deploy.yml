@@ -13,6 +13,20 @@ jobs:
       - name: 拉取代码
         uses: actions/checkout@v3
 
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 编译 Spring Boot 应用
+        run: |
+          mvn clean package -DskipTests
+          ls -la target/
+
+      - name: 确保 JAR 文件存在
+        run: test -f target/backend-web-0.0.1-SNAPSHOT.jar || exit 1
+
       - name: 登录 Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
