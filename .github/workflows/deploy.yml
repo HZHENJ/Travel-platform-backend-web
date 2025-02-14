@@ -28,7 +28,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "./target/backend.jar"
+          source: "./target/backend-web-0.0.1-SNAPSHOT.jar"
           target: "~/backend-web/backend.jar"
 
       - name: 运行 `deploy.sh`
