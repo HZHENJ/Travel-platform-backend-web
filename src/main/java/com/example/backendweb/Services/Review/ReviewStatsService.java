@@ -1,13 +1,19 @@
 package com.example.backendweb.Services.Review;
 
+import com.example.backendweb.Entity.Info.Attraction;
+import com.example.backendweb.Entity.Info.Hotel;
 import com.example.backendweb.Entity.Review.Review;
 import com.example.backendweb.Entity.Review.ReviewStats;
+import com.example.backendweb.Repository.AttractionRepository;
+import com.example.backendweb.Repository.HotelRepository;
 import com.example.backendweb.Repository.Review.ReviewStatsRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -15,10 +21,19 @@ public class ReviewStatsService {
 
     private final ReviewStatsRepository reviewStatsRepository;
 
-    public ReviewStatsService( ReviewStatsRepository reviewStatsRepository) {
-        this.reviewStatsRepository = reviewStatsRepository;
-    }
+    private final AttractionRepository attractionRepository;
 
+    private final HotelRepository hotelRepository;
+
+    public ReviewStatsService(
+            ReviewStatsRepository reviewStatsRepository,
+            AttractionRepository attractionRepository,
+            HotelRepository hotelRepository
+            ) {
+        this.attractionRepository = attractionRepository;
+        this.reviewStatsRepository = reviewStatsRepository;
+        this.hotelRepository = hotelRepository;
+    }
 
 
     /**
@@ -95,6 +110,48 @@ public class ReviewStatsService {
             case Attraction -> ReviewStats.ItemType.Attraction;
             default -> throw new IllegalArgumentException("Unsupported item type: " + itemType);
         };
+    }
+
+    public Optional<Map<String, Object>> getAttractionReviewStats(String uuid) {
+        Optional<Attraction> attractionOpt = attractionRepository.findByUuid(uuid);
+
+        if (attractionOpt.isEmpty()) {
+            return Optional.empty(); // Attraction 不存在
+        }
+
+        Attraction attraction = attractionOpt.get();
+        Optional<ReviewStats> statsOpt = reviewStatsRepository.findByItemTypeAndItemId(ReviewStats.ItemType.Attraction, attraction.getAttractionId());
+
+        if (statsOpt.isPresent()) {
+            ReviewStats stats = statsOpt.get();
+            Map<String, Object> result = new HashMap<>();
+            result.put("totalReviews", stats.getTotalReviews());
+            result.put("averageRating", stats.getAverageRating());
+            return Optional.of(result);
+        }
+
+        return Optional.of(Map.of("totalReviews", 0, "averageRating", BigDecimal.ZERO)); // 没有评论时返回默认值
+    }
+
+    // 获取酒店评分 & 评价数
+    public Optional<Map<String, Object>> getHotelReviewStats(String uuid) {
+        Optional<Hotel> hotelOpt = hotelRepository.findByUuid(uuid);
+        if (hotelOpt.isEmpty()) {
+            return Optional.empty(); // 酒店不存在
+        }
+
+        Hotel hotel = hotelOpt.get();
+        Optional<ReviewStats> statsOpt = reviewStatsRepository.findByItemTypeAndItemId(ReviewStats.ItemType.Hotel, hotel.getHotelId());
+
+        if (statsOpt.isPresent()) {
+            ReviewStats stats = statsOpt.get();
+            Map<String, Object> result = new HashMap<>();
+            result.put("totalReviews", stats.getTotalReviews());
+            result.put("averageRating", stats.getAverageRating());
+            return Optional.of(result);
+        }
+
+        return Optional.of(Map.of("totalReviews", 0, "averageRating", BigDecimal.ZERO)); // 没有评论时返回默认值
     }
 
 }

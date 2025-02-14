@@ -15,6 +15,7 @@ import java.util.Optional;
  * @Version 1.0
  */
 public interface ReviewStatsRepository extends JpaRepository<ReviewStats, Integer> {
+    Optional<ReviewStats> findByItemTypeAndItemId(ReviewStats.ItemType itemType, Integer itemId);
     Optional<ReviewStats> findByItemIdAndItemType(Integer itemId, ReviewStats.ItemType itemType);
     List<ReviewStats> findByItemTypeOrderByAverageRatingDesc(ReviewStats.ItemType itemType);
 }
