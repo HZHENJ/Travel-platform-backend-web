@@ -70,15 +70,17 @@ jobs:
             # 拉取最新 Docker 镜像
             docker pull hzhenj/backend-web:latest
 
-            # 停止旧容器（如果存在）
-            if [ "$(docker ps -q -f name=backend-web)" ]; then
-              echo "🔴 停止并删除旧容器 backend-web..."
-              docker stop backend-web && docker rm backend-web
+            # 强制删除已存在的 `backend-web` 容器（无论是否运行）
+            if [ "$(docker ps -aq -f name=backend-web)" ]; then
+              echo "🔴 删除旧的 backend-web 容器..."
+              docker stop backend-web || true
+              docker rm backend-web
             else
-              echo "✅ 没有正在运行的 backend-web 容器"
+              echo "✅ 没有需要删除的 backend-web 容器"
             fi
 
             # 运行新容器
             echo "🚀 启动新容器..."
             docker run -d --name backend-web -p 8080:8080 hzhenj/backend-web:latest
+
 
