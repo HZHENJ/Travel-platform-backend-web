@@ -1,4 +1,4 @@
-name: Deploy Backend to EC2
+name: Deploy Backend to EC2 using Docker
 
 on:
   push:
@@ -6,38 +6,32 @@ on:
       - deploy
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: 拉取代码
         uses: actions/checkout@v3
 
-      - name: 列出 GitHub Actions 运行目录
-        run: ls -la
+      - name: 登录 Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: 编译 Spring Boot 应用
-        run: mvn clean package -DskipTests
+      - name: 构建 Docker 镜像
+        run: |
+          docker build -t hzhenj/backend-web .
+          docker tag hzhenj/backend-web:latest hzhenj/backend-web:latest
 
-      - name: 检查 `target/backend.jar` 是否生成
-        run: ls -la target/
+      - name: 推送 Docker 镜像到 Docker Hub
+        run: docker push hzhenj/backend-web:latest
 
-      - name: 上传 `backend.jar` 到 EC2
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "./target/backend-web-0.0.1-SNAPSHOT.jar"
-          target: "~/backend-web/backend.jar"
-          overwrite: true
-
-      - name: 运行 `deploy.sh`
+      - name: SSH 连接到 EC2 并部署
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            chmod +x ~/backend-web/deploy.sh
-            ~/backend-web/deploy.sh
+            docker pull hzhenj/backend-web:latest
+            docker stop backend-web || true
+            docker rm backend-web || true
+            docker run -d --name backend-web -p 8080:8080 hzhenj/backend-web:latest
