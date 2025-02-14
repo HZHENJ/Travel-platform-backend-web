@@ -33,12 +33,13 @@ public class Preference {
     private User user; // 外键关联用户表
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TravelType travelType = TravelType.Single; // 旅行类型 (默认 Single)
 
     @Column(precision = 10, scale = 2)
     private BigDecimal budgetRange; // 预算范围
 
-    @Column(length = 50)
+    @Column(nullable = false, length = 50)
     private String language = "en"; // 语言 (默认 en)
 
     @Column(nullable = false, updatable = false)

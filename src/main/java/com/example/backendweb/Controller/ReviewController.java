@@ -1,71 +1,49 @@
 package com.example.backendweb.Controller;
 
-import com.example.backendweb.DTO.Review.ReviewRequest;
 import com.example.backendweb.Entity.Review.Review;
-import com.example.backendweb.Services.Review.ReviewService;
+import com.example.backendweb.Services.ReviewService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:5173/")
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
+    @Autowired
+    private ReviewService reviewService;
 
-    private final ReviewService reviewService;
-
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
-
-
-    // 获取所有评论
     @GetMapping
     public List<Review> getAllReviews() {
         return reviewService.getAllReviews();
     }
 
-    // 获取特定评论
-    @GetMapping("/{id}")
-    public ResponseEntity<Review> getReviewById(@PathVariable Integer id) {
-        Optional<Review> review = reviewService.getReviewById(id);
-        return review.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<Review> updateReview(@PathVariable Integer reviewId, @RequestBody Review review) {
+        Review updatedReview = reviewService.updateReview(reviewId, review);
+        return ResponseEntity.ok(updatedReview);
     }
 
-    // 根据 itemId 和 itemType 查找评论
-    @GetMapping("/search")
-    public List<Review> getReviewsByItem(
-            @RequestParam Integer itemId,
-            @RequestParam Review.ItemType itemType) {
-        return reviewService.getReviewsByItem(itemId, itemType);
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(@PathVariable Integer reviewId) {
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok().build();
     }
 
-    // 更新评论
-    @PutMapping("/{id}")
-    public ResponseEntity<Review> updateReview(@PathVariable Integer id, @RequestBody Review review) {
-        Optional<Review> updatedReview = reviewService.updateReview(id, review);
-        return updatedReview.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @PostMapping("/{reviewId}/reply")
+    public ResponseEntity<Review> replyToReview(
+            @PathVariable Integer reviewId,
+            @RequestBody Map<String, String> requestBody) {
+        String reply = requestBody.get("reply");
+        Review updatedReview = reviewService.addReplyToReview(reviewId, reply);
+        return ResponseEntity.ok(updatedReview);
     }
 
-    // 删除评论
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Integer id) {
-        if (reviewService.deleteReview(id)) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createReview(@RequestBody ReviewRequest request) {
-        try {
-            Review review = reviewService.createReview(request);
-            return ResponseEntity.ok(review);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Review failed: " + e.getMessage());
-        }
+    @GetMapping("/satisfaction")
+    public Map<String, Long> getReviewSatisfaction() {
+        return reviewService.getReviewSatisfaction();
     }
 }
