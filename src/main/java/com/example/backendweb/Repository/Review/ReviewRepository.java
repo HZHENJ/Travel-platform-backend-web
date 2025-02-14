@@ -20,6 +20,8 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Review> findByUserId(Integer userId);
     List<Review> findByItemIdAndItemType(Integer itemId, Review.ItemType itemType);
 
+    long countByUserIdAndItemType(Integer userId, Review.ItemType itemType);
+
     /**
      * 判断某个 `Booking` 是否已被该 `User` 评论
      */
@@ -37,6 +39,4 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     @Query("SELECT r, a.username FROM Review r JOIN Authentication a ON r.userId = a.user.userId WHERE r.itemId = :itemId AND r.itemType = 'Attraction'")
     List<Object[]> findReviewsWithUsernamesByAttractionId(@Param("itemId") Integer itemId);
-
-    Optional<Review> findByUserIdAndItemIdAndItemType(Integer userId, Integer itemId, Review.ItemType itemType);
 }

@@ -1,6 +1,8 @@
 package com.example.backendweb.Services.User;
 
 
+import com.example.backendweb.Entity.Review.Review;
+import com.example.backendweb.Repository.Review.ReviewRepository;
 import com.example.backendweb.Repository.User.AuthenticationRepository;
 import com.example.backendweb.Repository.User.PreferenceRepository;
 import com.example.backendweb.Repository.User.UserRepository;
@@ -22,11 +24,25 @@ public class UserService {
     private final PreferenceRepository preferenceRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository, AuthenticationRepository authenticationRepository, PreferenceRepository preferenceRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    private final ReviewRepository reviewRepository;
+
+    public UserService(UserRepository userRepository,
+                       AuthenticationRepository authenticationRepository,
+                       PreferenceRepository preferenceRepository,
+                       BCryptPasswordEncoder bCryptPasswordEncoder,
+                       ReviewRepository reviewRepository
+    ) {
         this.userRepository = userRepository;
         this.authenticationRepository = authenticationRepository;
         this.preferenceRepository = preferenceRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.reviewRepository = reviewRepository;
+    }
+
+    // 判断用户是否是 Attraction 的新用户（booking < 5）
+    public boolean isNewAttractionUser(Integer userId) {
+        long attractionBookingCount = reviewRepository.countByUserIdAndItemType(userId, Review.ItemType.Attraction);
+        return attractionBookingCount < 5; // 少于 5 次 booking，判定为新用户
     }
 
     public User login(String email, String password) {

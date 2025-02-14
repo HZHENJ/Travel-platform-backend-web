@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,6 +68,11 @@ public class BookingService {
         // 1. 查询该用户的所有 Booking
         List<Booking> userBookings = bookingRepository.findByUserId(userId);
 
+        // 2. 如果用户没有任何 Booking，直接返回空列表
+        if (userBookings.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         // 2. 提取 bookingId
         List<Integer> bookingIds = userBookings.stream()
                 .map(Booking::getBookingId)
@@ -103,6 +109,11 @@ public class BookingService {
     public List<HotelBookingDTO> getHotelBookingsByUserId(Integer userId) {
         // 1. 查询该用户的所有 Booking
         List<Booking> userBookings = bookingRepository.findByUserIdAndBookingType(userId, Booking.BookingType.Hotel);
+
+        // 2. 如果用户没有任何 Booking，直接返回空列表
+        if (userBookings.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         // 2. 提取 bookingId
         List<Integer> bookingIds = userBookings.stream()

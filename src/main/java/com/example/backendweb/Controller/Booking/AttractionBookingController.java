@@ -45,6 +45,12 @@ public class AttractionBookingController {
     @GetMapping("/bookings/{userId}")
     public ResponseEntity<List<AttractionBookingDTO>> getAttractionBookingsByUser(@PathVariable Integer userId) {
         List<AttractionBookingDTO> attractionBookings = bookingService.getAttractionBookingsByUserId(userId);
+
+        // 如果没有找到任何 booking，返回 HTTP 204 No Content
+        if (attractionBookings.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok(attractionBookings);
     }
 

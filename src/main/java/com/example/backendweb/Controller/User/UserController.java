@@ -32,6 +32,11 @@ public class UserController {
         this.jwtUtil = jwtUtil;
     }
 
+    @GetMapping("/{userId}/is-new-attraction-user")
+    public boolean isNewAttractionUser(@PathVariable Integer userId) {
+        return userService.isNewAttractionUser(userId);
+    }
+
     /**
      * 用户注册（支持带或不带 `Preference`）
      */

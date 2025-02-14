@@ -45,6 +45,12 @@ public class HotelBookingController {
     @GetMapping("/bookings/{userId}")
     public ResponseEntity<List<HotelBookingDTO>> getHotelBookingsByUser(@PathVariable Integer userId) {
         List<HotelBookingDTO> hotelBookings = bookingService.getHotelBookingsByUserId(userId);
+
+        // 如果没有找到任何 Hotel Booking，返回 HTTP 204 No Content
+        if (hotelBookings.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok(hotelBookings);
     }
 
