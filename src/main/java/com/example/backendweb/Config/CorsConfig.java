@@ -24,7 +24,6 @@ public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        logger.info("----------------------");
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
@@ -42,7 +41,9 @@ public class CorsConfig {
     private String[] getAllowedOrigins() {
         String allowedOrigins = System.getenv("ALLOWED_ORIGINS"); // 读取环境变量
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
-            return new String[]{"http://localhost:5173"}; // 默认本地开发
+            return new String[]{
+                    "http://localhost:5173", // 默认本地开发
+                    "http://18.142.51.29"};
         }
         return allowedOrigins.split(",");
     }
