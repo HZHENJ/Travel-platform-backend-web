@@ -1,8 +1,9 @@
 package com.example.backendweb.Services.User;
 
 
-import com.example.backendweb.Entity.Review.Review;
-import com.example.backendweb.Repository.Review.ReviewRepository;
+import com.example.backendweb.Entity.Booking.Booking;
+import com.example.backendweb.Repository.Booking.AttractionBookingRepository;
+import com.example.backendweb.Repository.Booking.BookingRepository;
 import com.example.backendweb.Repository.User.AuthenticationRepository;
 import com.example.backendweb.Repository.User.PreferenceRepository;
 import com.example.backendweb.Repository.User.UserRepository;
@@ -10,12 +11,14 @@ import com.example.backendweb.Entity.Exception.CustomException;
 import com.example.backendweb.Entity.User.Authentication;
 import com.example.backendweb.Entity.User.Preference;
 import com.example.backendweb.Entity.User.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -24,25 +27,31 @@ public class UserService {
     private final PreferenceRepository preferenceRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final ReviewRepository reviewRepository;
+    private final BookingRepository bookingRepository;
 
     public UserService(UserRepository userRepository,
                        AuthenticationRepository authenticationRepository,
                        PreferenceRepository preferenceRepository,
                        BCryptPasswordEncoder bCryptPasswordEncoder,
-                       ReviewRepository reviewRepository
+                       BookingRepository bookingRepository
     ) {
         this.userRepository = userRepository;
         this.authenticationRepository = authenticationRepository;
         this.preferenceRepository = preferenceRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.reviewRepository = reviewRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     // 判断用户是否是 Attraction 的新用户（booking < 5）
     public boolean isNewAttractionUser(Integer userId) {
-        long attractionBookingCount = reviewRepository.countByUserIdAndItemType(userId, Review.ItemType.Attraction);
-        return attractionBookingCount < 5; // 少于 5 次 booking，判定为新用户
+        log.info("Checking if user {} is a new attraction user...", userId);
+
+        long attractionBookingCount = bookingRepository.countByUserIdAndBookingType(userId, Booking.BookingType.Attraction);
+
+        boolean isNewUser = attractionBookingCount < 5;
+        log.info("User {} has booked attractions {} times. Is new user: {}", userId, attractionBookingCount, isNewUser);
+
+        return isNewUser;
     }
 
     public User login(String email, String password) {
