@@ -8,8 +8,12 @@ import com.example.backendweb.Entity.User.Preference;
 import com.example.backendweb.Entity.User.User;
 import com.example.backendweb.Services.User.UserService;
 import com.example.backendweb.Util.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @ClassName UserController
@@ -83,7 +87,41 @@ public class UserController {
                 ));
     }
 
+    // 获取用户信息
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserProfile(@PathVariable Integer userId) {
+        Optional<User> user = userService.getUserById(userId);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
+        }
+        return ResponseEntity.ok(user.get());
+    }
 
+    /**
+     * 更新用户信息
+     */
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateUserProfile(@PathVariable Integer userId, @RequestBody User updatedUser) {
+        User user = userService.updateUser(userId, updatedUser);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/{userId}/preferences")
+    public ResponseEntity<Preference> getUserPreferences(@PathVariable Integer userId) {
+        return userService.getUserPreferences(userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    /**
+     * 更新或创建用户偏好
+     */
+    @PutMapping("/{userId}/preferences")
+    public ResponseEntity<?> updateUserPreferences(@PathVariable Integer userId, @RequestBody Preference newPreferences) {
+        Preference updatedPreferences = userService.updateOrCreatePreferences(userId, newPreferences);
+        return ResponseEntity.ok(updatedPreferences);
+    }
 
 }
 

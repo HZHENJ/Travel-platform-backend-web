@@ -137,4 +137,36 @@ public class UserService {
         return authenticationRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException("User authentication not found", 404));
     }
+
+    public User updateUser(Integer userId, User updatedUser) {
+        return userRepository.findById(userId).map(user -> {
+            user.setName(updatedUser.getName());
+            user.setEmail(updatedUser.getEmail());
+            user.setDateOfBirth(updatedUser.getDateOfBirth());
+            user.setGender(updatedUser.getGender());
+            user.setCountry(updatedUser.getCountry());
+            return userRepository.save(user);
+        }).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public Optional<Preference> getUserPreferences(Integer userId) {
+        return preferenceRepository.findByUser_UserId(userId);
+    }
+
+    public Preference updateOrCreatePreferences(Integer userId, Preference newPreferences) {
+        return preferenceRepository.findByUser_UserId(userId).map(preference -> {
+            preference.setTravelType(newPreferences.getTravelType());
+            preference.setBudgetRange(newPreferences.getBudgetRange());
+            preference.setLanguage(newPreferences.getLanguage());
+            return preferenceRepository.save(preference);
+        }).orElseGet(() -> {
+            User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+            newPreferences.setUser(user);
+            return preferenceRepository.save(newPreferences);
+        });
+    }
+
+    public Optional<User> getUserById(Integer userId) {
+        return userRepository.findById(userId);
+    }
 }
