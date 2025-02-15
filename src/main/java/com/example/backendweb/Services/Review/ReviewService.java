@@ -106,66 +106,6 @@ public class ReviewService {
         return false;
     }
 
-    // @Transactional
-    // public Review createReview(ReviewRequest request) {
-    //     // Step 1: 查找现有 Review
-    //     Optional<Review> existingReview = reviewRepository.findByBookingId(request.getBookingId());
-    //
-    //     Review review;
-    //     if (existingReview.isPresent()) {
-    //         // 已存在 Review，更新数据
-    //         review = existingReview.get();
-    //         review.setRating(request.getRating());
-    //         review.setComment(request.getComment());
-    //         review.setStatus(Review.ReviewStatus.show); // 使评论可见
-    //         review.setUpdatedAt(LocalDateTime.now()); // 手动更新时间
-    //     } else {
-    //         // 如果 `Review` 不存在，创建新 Review
-    //         review = Review.builder()
-    //                 .userId(request.getUserId())
-    //                 .bookingId(request.getBookingId()) // 确保 `bookingId` 赋值正确
-    //                 .itemType(Review.ItemType.valueOf(request.getItemType()))
-    //                 .itemId(request.getItemId())
-    //                 .rating(request.getRating())
-    //                 .comment(request.getComment())
-    //                 .status(Review.ReviewStatus.show) // 直接显示评论
-    //                 .createdAt(LocalDateTime.now())
-    //                 .updatedAt(LocalDateTime.now())
-    //                 .build();
-    //     }
-    //
-    //     reviewRepository.save(review); // 保存 Review
-    //
-    //     // Step 2: 更新 ReviewStats
-    //     Optional<ReviewStats> existingStats = reviewStatsRepository.findByItemIdAndItemType(
-    //             request.getItemId(), ReviewStats.ItemType.valueOf(request.getItemType())
-    //     );
-    //
-    //     if (existingStats.isPresent()) {
-    //         ReviewStats stats = existingStats.get();
-    //
-    //         // 计算新的总评分
-    //         BigDecimal newTotalRating = stats.getAverageRating().multiply(BigDecimal.valueOf(stats.getTotalReviews()))
-    //                 .add(request.getRating()) // 添加新评分
-    //                 .divide(BigDecimal.valueOf(stats.getTotalReviews() + 1), 1, BigDecimal.ROUND_HALF_UP);
-    //
-    //         stats.setTotalReviews(stats.getTotalReviews() + 1);
-    //         stats.setAverageRating(newTotalRating);
-    //         reviewStatsRepository.save(stats);
-    //     }
-    //     else {
-    //         // 如果没有 ReviewStats，创建新统计记录
-    //         ReviewStats newStats = ReviewStats.builder()
-    //                 .itemType(ReviewStats.ItemType.valueOf(request.getItemType()))
-    //                 .itemId(request.getItemId())
-    //                 .totalReviews(1)
-    //                 .averageRating(request.getRating())
-    //                 .build();
-    //         reviewStatsRepository.save(newStats);
-    //     }
-    //
-    //     return review;
-    // }
     @Transactional
     public Review createReview(ReviewRequest request) {
         try {
