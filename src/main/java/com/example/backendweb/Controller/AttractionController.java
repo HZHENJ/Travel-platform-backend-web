@@ -1,6 +1,5 @@
 package com.example.backendweb.Controller;
 
-import com.example.backendweb.DTO.Review.ReviewWithUsernameDTO;
 import com.example.backendweb.Entity.Review.Review;
 import com.example.backendweb.Services.AttractionService;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -35,6 +35,16 @@ public class AttractionController {
             // List<ReviewWithUsernameDTO> reviews = attractionService.getReviewsWithUsernameByUuid(uuid);
             List<Review> reviews = attractionService.getReviewsByUuid(uuid);
             return ResponseEntity.ok(reviews);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/{uuid}/rating")
+    public ResponseEntity<BigDecimal> getRatingByAttractionUuid(@PathVariable String uuid) {
+        try {
+            BigDecimal rating = attractionService.getRatingByUuid(uuid);
+            return ResponseEntity.ok(rating);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }

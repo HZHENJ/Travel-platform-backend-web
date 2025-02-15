@@ -4,10 +4,13 @@ import com.example.backendweb.DTO.Review.ReviewWithUsernameDTO;
 import com.example.backendweb.Entity.Info.Attraction;
 import com.example.backendweb.DTO.AttractionDTO;
 import com.example.backendweb.Entity.Review.Review;
+import com.example.backendweb.Entity.Review.ReviewStats;
 import com.example.backendweb.Repository.AttractionRepository;
 import com.example.backendweb.Repository.Review.ReviewRepository;
+import com.example.backendweb.Repository.Review.ReviewStatsRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,11 +19,13 @@ public class AttractionService {
 
     private final AttractionRepository attractionRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewStatsRepository reviewStatsRepository;
 
     public AttractionService(AttractionRepository attractionRepository,
-                             ReviewRepository reviewRepository) {
+                             ReviewRepository reviewRepository, ReviewStatsRepository reviewStatsRepository) {
         this.attractionRepository = attractionRepository;
         this.reviewRepository = reviewRepository;
+        this.reviewStatsRepository = reviewStatsRepository;
     }
 
     public List<Attraction> saveAttractions(List<AttractionDTO> attractionDTOs) {
@@ -105,5 +110,16 @@ public class AttractionService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    public BigDecimal getRatingByUuid(String uuid) {
+        // Step 1: 根据 UUID 查询景点
+        Attraction attraction = attractionRepository.findByUuid(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("Attraction not found for UUID: " + uuid));
+
+        // Step 2: 查询与该景点相关的评分
+        return reviewStatsRepository.findByItemIdAndItemType(attraction.getAttractionId(), ReviewStats.ItemType.Attraction)
+                .map(ReviewStats::getAverageRating)
+                .orElse(BigDecimal.valueOf(0.0));
     }
 }
