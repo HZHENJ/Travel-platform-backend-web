@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -374,5 +373,13 @@ public class BookingService {
         // 更新 Booking 状态为 Canceled
         booking.setStatus(Booking.BookingStatus.Canceled);
         bookingRepository.save(booking);
+    }
+
+    public List<FlightBooking> getFlightBookingsByUserId(Integer userId) {
+           List<Integer> bkIds = bookingRepository.findByUserIdAndBookingType(userId, Booking.BookingType.Flight)
+                   .stream()
+                   .map(Booking::getBookingId)
+                   .toList();
+        return flightBookingRepository.findByBookingIdIn(bkIds);
     }
 }
