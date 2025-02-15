@@ -9,7 +9,9 @@ import com.example.backendweb.Repository.Review.ReviewStatsRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -31,7 +33,8 @@ public class HotelService {
 
     public HotelService(
             HotelRepository hotelRepository,
-            ReviewRepository reviewRepository, ReviewStatsRepository reviewStatsRepository
+            ReviewRepository reviewRepository,
+            ReviewStatsRepository reviewStatsRepository
     ) {
         this.hotelRepository = hotelRepository;
         this.reviewRepository = reviewRepository;
@@ -46,6 +49,27 @@ public class HotelService {
         // 查询与该景点相关的评论
         return reviewRepository.findByHotelId(hotel.getHotelId(), Review.ItemType.Hotel);
     }
+
+    public Optional<Map<String, Object>> getHotelReviewStats(String uuid) {
+        Optional<Hotel> hotelOpt = hotelRepository.findByUuid(uuid);
+        if (hotelOpt.isEmpty()) {
+            return Optional.empty(); // Hotel 不存在
+        }
+
+        Hotel hotel = hotelOpt.get();
+        Optional<ReviewStats> statsOpt = reviewStatsRepository.findByItemTypeAndItemId(ReviewStats.ItemType.Hotel, hotel.getHotelId());
+
+        if (statsOpt.isPresent()) {
+            ReviewStats stats = statsOpt.get();
+            Map<String, Object> result = new HashMap<>();
+            result.put("totalReviews", stats.getTotalReviews());
+            result.put("averageRating", stats.getAverageRating());
+            return Optional.of(result);
+        }
+
+        return Optional.of(Map.of("totalReviews", 0, "averageRating", BigDecimal.ZERO));
+    }
+
 
     public BigDecimal getRatingByUuid(String uuid) {
         // 根据uuid查询景点

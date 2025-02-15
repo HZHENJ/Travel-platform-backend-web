@@ -18,11 +18,14 @@ import java.util.stream.Collectors;
 public class AttractionService {
 
     private final AttractionRepository attractionRepository;
-    private final ReviewRepository reviewRepository;
     private final ReviewStatsRepository reviewStatsRepository;
+    private final ReviewRepository reviewRepository;
 
-    public AttractionService(AttractionRepository attractionRepository,
-                             ReviewRepository reviewRepository, ReviewStatsRepository reviewStatsRepository) {
+    public AttractionService(
+            AttractionRepository attractionRepository,
+            ReviewRepository reviewRepository,
+            ReviewStatsRepository reviewStatsRepository
+    ) {
         this.attractionRepository = attractionRepository;
         this.reviewRepository = reviewRepository;
         this.reviewStatsRepository = reviewStatsRepository;
@@ -84,9 +87,29 @@ public class AttractionService {
         // Step 1: 根据 UUID 查询景点
         Attraction attraction = attractionRepository.findByUuid(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("Attraction not found for UUID: " + uuid));
-
         // Step 2: 查询与该景点相关的评论
         return reviewRepository.findByAttractionId(attraction.getAttractionId(), Review.ItemType.Attraction);
+    }
+
+    public Optional<Map<String, Object>> getAttractionReviewStats(String uuid) {
+        Optional<Attraction> attractionOpt = attractionRepository.findByUuid(uuid);
+
+        if (attractionOpt.isEmpty()) {
+            return Optional.empty(); // Attraction 不存在
+        }
+
+        Attraction attraction = attractionOpt.get();
+        Optional<ReviewStats> statsOpt = reviewStatsRepository.findByItemTypeAndItemId(ReviewStats.ItemType.Attraction, attraction.getAttractionId());
+
+        if (statsOpt.isPresent()) {
+            ReviewStats stats = statsOpt.get();
+            Map<String, Object> result = new HashMap<>();
+            result.put("totalReviews", stats.getTotalReviews());
+            result.put("averageRating", stats.getAverageRating());
+            return Optional.of(result);
+        }
+
+        return Optional.of(Map.of("totalReviews", 0, "averageRating", BigDecimal.ZERO)); // 没有评论时返回默认值
     }
 
     public List<ReviewWithUsernameDTO> getReviewsWithUsernameByUuid(String uuid) {

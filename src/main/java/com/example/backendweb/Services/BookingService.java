@@ -22,6 +22,7 @@ import com.example.backendweb.Repository.HotelRepository;
 import com.example.backendweb.Repository.Review.ReviewRepository;
 import com.example.backendweb.Repository.Review.ReviewStatsRepository;
 import com.example.backendweb.Repository.User.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +42,7 @@ import java.util.stream.Collectors;
  * @Version 1.0
  */
 
+@Slf4j
 @Service
 public class BookingService {
 
@@ -167,14 +170,19 @@ public class BookingService {
 
     @Transactional
     public AttractionBooking createAttractionBooking(AttractionBookingRequest request) {
-        // Step 1: 验证景点信息
-        Attraction attraction = attractionRepository.findByUuid(request.getUuid())
-                .orElseGet(() -> {
-                    Attraction newAttraction = Attraction.builder()
-                            .uuid(request.getUuid())
-                            .build();
-                    return attractionRepository.save(newAttraction);
-                });
+        log.info("Starting Attraction Booking process for UUID: {}", request.getUuid());
+
+        // Step 1: 通过 UUID 查找 Attraction，若有多个则取第一个
+        Optional<Attraction> attractionOpt = attractionRepository.findByUuid(request.getUuid());
+
+        Attraction attraction = attractionOpt.orElseGet(() -> {
+            log.info("Attraction not found, creating new attraction with UUID: {}", request.getUuid());
+            Attraction newAttraction = Attraction.builder()
+                    .uuid(request.getUuid())
+                    .build();
+            return attractionRepository.save(newAttraction);
+        });
+        log.info("Attraction found/created. Attraction ID: {}", attraction.getAttractionId());
 
         // Step 2: 创建通用 Booking 记录
         Booking booking = Booking.builder()
@@ -184,6 +192,7 @@ public class BookingService {
                 .totalAmount(BigDecimal.valueOf(request.getPrice()))
                 .build();
         booking = bookingRepository.save(booking);
+        log.info("Booking record created with ID: {}, Amount: {}", booking.getBookingId(), booking.getTotalAmount());
 
         // Step 3: 创建具体的 AttractionBooking 记录
         AttractionBooking attractionBooking = AttractionBooking.builder()
@@ -194,12 +203,16 @@ public class BookingService {
                 .numberOfTickets(request.getNumberOfTickets())
                 .build();
         attractionBookingRepository.save(attractionBooking);
+        log.info("AttractionBooking record created for Attraction ID: {}, Booking ID: {}",
+                attraction.getAttractionId(), booking.getBookingId());
 
-        // Step 4: 检查是否是该景点的第一条 `AttractionBooking`
-        boolean isFirstBooking = attractionBookingRepository.countByAttractionId(attraction.getAttractionId()) == 1;
+        // Step 4: 检查是否已存在 ReviewStats 记录
+        Optional<ReviewStats> reviewStatsOpt = reviewStatsRepository.findByItemTypeAndItemId(
+                ReviewStats.ItemType.Attraction, attraction.getAttractionId()
+        );
 
-        if (isFirstBooking) {
-            // Step 4.1: 创建 ReviewStats
+        if (reviewStatsOpt.isEmpty()) {
+            // 如果没有 ReviewStats 记录，则创建新记录
             ReviewStats reviewStats = ReviewStats.builder()
                     .itemType(ReviewStats.ItemType.Attraction)
                     .itemId(attraction.getAttractionId())
@@ -207,6 +220,9 @@ public class BookingService {
                     .averageRating(BigDecimal.ZERO) // 初始评分 0
                     .build();
             reviewStatsRepository.save(reviewStats);
+            log.info("ReviewStats record created for Attraction ID: {}", attraction.getAttractionId());
+        } else {
+            log.info("ReviewStats record already exists for Attraction ID: {}, skipping creation.", attraction.getAttractionId());
         }
 
         // Step 5: 创建 Review 记录
@@ -220,35 +236,29 @@ public class BookingService {
                 .status(Review.ReviewStatus.hide) // 初始状态为隐藏
                 .build();
         reviewRepository.save(review);
+        log.info("Review record created for Booking ID: {}, Attraction ID: {}",
+                booking.getBookingId(), attraction.getAttractionId());
 
+        log.info("Attraction Booking process completed successfully for UUID: {}", request.getUuid());
         return attractionBooking;
     }
 
+
     @Transactional
     public HotelBooking createHotelBooking(HotelBookingRequest request) {
-        // Step 1: 确保 `Hotel` 存在
-        Hotel hotel = hotelRepository.findByUuid(request.getUuid())
-                // .orElseThrow(() -> new IllegalArgumentException("Invalid hotel UUID: " + request.getUuid()));
-                .orElseGet(() -> {
-                    Hotel newhotel = Hotel.builder()
-                            .uuid(request.getUuid())
-                            .build();
-                    return hotelRepository.save(newhotel);
-                });
+        log.info("Starting Hotel Booking process for UUID: {}", request.getUuid());
 
+        // Step 1: 通过 UUID 查找 Hotel，若有多个则取第一个
+        Optional<Hotel> hotelOpt = hotelRepository.findByUuid(request.getUuid());
 
-        // // Step 2: 确保 `roomType` 存在
-        // if (!hotel.getRoomType().containsKey(request.getRoomType())) {
-        //     throw new IllegalArgumentException("Invalid room type: " + request.getRoomType());
-        // }
-
-        // // Step 3: 检查房间剩余数量
-        // Map<String, Integer> roomAvailability = hotel.getRoomAvailability();
-        // int availableRooms = roomAvailability.getOrDefault(request.getRoomType(), 0);
-        //
-        // if (availableRooms < request.getNumberOfRooms()) {
-        //     throw new IllegalStateException("Not enough rooms available for type: " + request.getRoomType());
-        // }
+        Hotel hotel = hotelOpt.orElseGet(() -> {
+            log.info("Hotel not found, creating new Hotel with UUID: {}", request.getUuid());
+            Hotel newHotel = Hotel.builder()
+                    .uuid(request.getUuid())
+                    .build();
+            return hotelRepository.save(newHotel);
+        });
+        log.info("Hotel found/created. Hotel ID: {}", hotel.getHotelId());
 
         // Step 2: 创建 `Booking` 记录
         Booking booking = Booking.builder()
@@ -258,6 +268,7 @@ public class BookingService {
                 .totalAmount(BigDecimal.valueOf(request.getPrice()))
                 .build();
         booking = bookingRepository.save(booking);
+        log.info("Booking record created with ID: {}, Amount: {}", booking.getBookingId(), booking.getTotalAmount());
 
         // Step 3: 创建 `HotelBooking` 记录
         HotelBooking hotelBooking = HotelBooking.builder()
@@ -269,19 +280,25 @@ public class BookingService {
                 .guests(request.getGuests())
                 .build();
         hotelBookingRepository.save(hotelBooking);
+        log.info("HotelBooking record created for Hotel ID: {}, Booking ID: {}", hotel.getHotelId(), booking.getBookingId());
 
+        // Step 4: 检查是否已存在 ReviewStats 记录
+        Optional<ReviewStats> reviewStatsOpt = reviewStatsRepository.findByItemTypeAndItemId(
+                ReviewStats.ItemType.Hotel, hotel.getHotelId()
+        );
 
-        // Step 4: 如果是该酒店的第一条预订，创建 `ReviewStats`
-        boolean isFirstBooking = hotelBookingRepository.countByHotelId(hotel.getHotelId()) == 1;
-
-        if (isFirstBooking) {
+        if (reviewStatsOpt.isEmpty()) {
+            // 如果没有 ReviewStats 记录，则创建新记录
             ReviewStats reviewStats = ReviewStats.builder()
                     .itemType(ReviewStats.ItemType.Hotel)
                     .itemId(hotel.getHotelId())
                     .totalReviews(0)
-                    .averageRating(BigDecimal.ZERO)
+                    .averageRating(BigDecimal.ZERO) // 初始评分 0
                     .build();
             reviewStatsRepository.save(reviewStats);
+            log.info("ReviewStats record created for Hotel ID: {}", hotel.getHotelId());
+        } else {
+            log.info("ReviewStats record already exists for Hotel ID: {}, skipping creation.", hotel.getHotelId());
         }
 
         // Step 5: 创建 Review 记录
@@ -295,9 +312,12 @@ public class BookingService {
                 .status(Review.ReviewStatus.hide) // 初始状态为隐藏
                 .build();
         reviewRepository.save(review);
+        log.info("Review record created for Booking ID: {}, Hotel ID: {}", booking.getBookingId(), hotel.getHotelId());
 
+        log.info("Hotel Booking process completed successfully for UUID: {}", request.getUuid());
         return hotelBooking;
     }
+
 
     public FlightBooking createFlightBooking(FlightBookingRequest request) {
         // 创建通用 Booking 记录

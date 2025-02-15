@@ -36,7 +36,6 @@ public class User {
     @Temporal(TemporalType.DATE)
     private Date dateOfBirth; // 用户出生日期（可选）
 
-    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private Gender gender; // 用户性别
 
@@ -50,7 +49,7 @@ public class User {
     @Column(nullable = false)
     private Status status; // 用户状态默认为Status.Active
 
-    @Column(nullable = true, length = 100)
+    @Column(length = 100)
     private String country; // 用户所在国家
 
     @PrePersist

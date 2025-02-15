@@ -20,7 +20,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/recommendations")
+@RequestMapping("/api/recommendations")
 public class RecommendationController {
     @Autowired
     private RecommendationService recommendationService;
