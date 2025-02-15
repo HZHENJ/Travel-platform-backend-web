@@ -2,20 +2,17 @@ package com.example.backendweb.Repository.Booking;
 
 import com.example.backendweb.Entity.Booking.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-/**
- * @ClassName BookingRepository
- * @Description
- * @Author HUANG ZHENJIA
- * @StudentID A0298312B
- * @Date 2025/2/6
- * @Version 1.0
- */
-@Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
-    List<Booking> findByUserId(Integer userId);
-    List<Booking> findByUserIdAndBookingType(Integer userId, Booking.BookingType bookingType);
+    @Query("SELECT MONTH(b.updatedAt) as month, COUNT(b) as count " +
+            "FROM Booking b " +
+            "GROUP BY MONTH(b.updatedAt) " +
+            "ORDER BY MONTH(b.updatedAt)")
+    List<Object[]> getYearlyBookingCounts();
+
+    @Query("SELECT b.bookingType, COUNT(b) FROM Booking b GROUP BY b.bookingType")
+    List<Object[]> getBookingCountsByType();
 }

@@ -22,17 +22,11 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                // 对所有路径生效
                 registry.addMapping("/**")
-                        // 允许所有来源，如果你只允许特定域名，请替换为对应域名，例如 "http://example.com"
-                        .allowedOrigins("http://localhost:5173")
-                        // 允许的请求方法
+                        .allowedOriginPatterns("*")  // Allow all origins while supporting credentials
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        // 允许的请求头
                         .allowedHeaders("*")
-                        // 是否允许发送 Cookie 等凭证信息，若允许则设置为 true
-                        .allowCredentials(false)
-                        // 预检请求的缓存时间（秒）
+                        .allowCredentials(true)
                         .maxAge(3600);
             }
         };

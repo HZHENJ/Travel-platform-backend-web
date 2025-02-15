@@ -1,4 +1,4 @@
-package com.example.backendweb.Services.User;
+package com.example.backendweb.Services.User    ;
 
 
 import com.example.backendweb.Repository.User.AuthenticationRepository;
@@ -10,7 +10,6 @@ import com.example.backendweb.Entity.User.Preference;
 import com.example.backendweb.Entity.User.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -29,60 +28,31 @@ public class UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User login(String email, String password) {
-        // find user by email
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            throw new CustomException("User not found", 404);
+    public User Login(String Username,String Password){
+        Optional<Authentication> data = authenticationRepository.findByUsername(Username);
+        if(data.isPresent() && data.get().getPasswordHash().equals(Password)){
+            return data.get().getUser();
+        }else{
+            throw new CustomException("User not exist or Wrong password",400);
         }
-        User user = userOpt.get();
-
-        // find auth by user
-        Optional<Authentication> authOpt = authenticationRepository.findByUser(user);
-        if (authOpt.isEmpty()) {
-            throw new CustomException("User not found", 404);
-        }
-        Authentication auth = authOpt.get();
-
-        if (!bCryptPasswordEncoder.matches(password, auth.getPasswordHash())) {
-            throw new CustomException("Invalid password", 401);
-        }
-
-        return auth.getUser();
     }
 
-    @Transactional
-    public boolean registerUserData(Authentication auth, User user, Preference pre){
-        boolean userRegistered = registerUser(user);
-        boolean authRegistered = registerAuthentication(auth, user);
-        boolean preRegistered = registerPreference(pre, user);
-        return userRegistered && authRegistered && preRegistered;
+    public boolean RetriveData(Authentication auth, User user, Preference pre){
+        return registerUser(user) && registerAuthentication(auth,user) && registerPreference(pre,user);
     }
 
-    /**
-     * 注册 `User`
-     */
-    public boolean registerUser(User user) {
-        if (user == null) {
-            throw new CustomException("Empty Data", 400);
-        }
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new CustomException("User already exists", 409);
-        }
+    public boolean registerUser(User user){
+        if(user == null) throw new CustomException("Empty Data",400);
+        Optional<User> existingUser = userRepository.findById(user.getUserId());
+        if(existingUser.isPresent()) throw new CustomException("User already exits",409);
         userRepository.save(user);
         return true;
     }
 
-    /**
-     * 注册 `Authentication`
-     */
-    public boolean registerAuthentication(Authentication auth, User user){
-        if(auth == null || user == null) {
-            throw new CustomException("Empty Data",400);
-        }
-        if (authenticationRepository.findByUsername(auth.getUsername()).isPresent()) {
-            throw new CustomException("User already exists", 409);
-        }
+    public boolean registerAuthentication(Authentication auth,User user){
+        if(auth == null || user == null) throw new CustomException("Empty Data",400);
+        Optional<Authentication> existingAuth = authenticationRepository.findById(auth.getAuthId());
+        if(existingAuth.isPresent()) throw new CustomException("User already exits",409);
         auth.setPasswordHash(bCryptPasswordEncoder.encode(auth.getPasswordHash()));
         auth.setUser(user);
         authenticationRepository.save(auth);
@@ -90,26 +60,11 @@ public class UserService {
     }
 
     public boolean registerPreference(Preference pre,User user){
-        if(user == null) {
-            throw new CustomException("Empty Data",400);
-        }
-        // if `pre` is null，create default `Preference`
-        if(pre == null) {
-            pre = Preference.builder()
-                    .user(user)
-                    .build();
-        } else {
-            pre.setUser(user);
-        }
+        if(pre == null || user == null) throw new CustomException("Empty Data",400);
+        Optional<Authentication> existingPre = authenticationRepository.findById(pre.getPreferenceId());
+        if(existingPre.isPresent()) throw new CustomException("User already exits",409);
+        pre.setUser(user);
         preferenceRepository.save(pre);
         return true;
-    }
-
-    /**
-     * 根据username获取 `Authentication` 记录
-     */
-    public Authentication getUserAuthentication(User user) {
-        return authenticationRepository.findByUser(user)
-                .orElseThrow(() -> new CustomException("User authentication not found", 404));
     }
 }

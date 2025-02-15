@@ -1,64 +1,38 @@
 package com.example.backendweb.Controller.Booking;
 
-import com.example.backendweb.DTO.Booking.AttractionBookingDTO;
-import com.example.backendweb.DTO.Booking.HotelBookingDTO;
-import com.example.backendweb.DTO.Booking.HotelBookingRequest;
 import com.example.backendweb.Entity.Booking.HotelBooking;
-import com.example.backendweb.Services.BookingService;
-import org.springframework.http.HttpStatus;
+import com.example.backendweb.Services.HotelBookingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * @ClassName HotelBookingController
- * @Description
- * @Author HUANG ZHENJIA
- * @StudentID A0298312B
- * @Date 2025/2/11
- * @Version 1.0
- */
-
+@CrossOrigin(origins = "http://localhost:5173/")
 @RestController
-@RequestMapping("/api/hotels")
+@RequestMapping("/api/hotelBookings")
 public class HotelBookingController {
-    private final BookingService bookingService;
 
-    public HotelBookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
+    @Autowired
+    private HotelBookingService hotelBookingService;
+
+    @GetMapping
+    public List<HotelBooking> getAllHotelBookings() {
+        return hotelBookingService.getAllHotelBookings();
     }
 
-    /**
-     * 处理创建酒店预订的请求
-     */
-    @PostMapping("/booking")
-    public ResponseEntity<?> createHotelBooking(@RequestBody HotelBookingRequest request) {
-        try {
-            HotelBooking hotelBooking = bookingService.createHotelBooking(request);
-            return ResponseEntity.ok(hotelBooking);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage());
-        }
+    @PutMapping("/{hotelBookingId}")
+    public ResponseEntity<HotelBooking> updateHotelBooking(
+            @PathVariable Integer hotelBookingId, @RequestBody HotelBooking hotelBooking) {
+
+        HotelBooking updatedBooking = hotelBookingService.updateHotelBooking(hotelBookingId, hotelBooking);
+        return ResponseEntity.ok(updatedBooking);
     }
 
-    @GetMapping("/bookings/{userId}")
-    public ResponseEntity<List<HotelBookingDTO>> getHotelBookingsByUser(@PathVariable Integer userId) {
-        List<HotelBookingDTO> hotelBookings = bookingService.getHotelBookingsByUserId(userId);
-        return ResponseEntity.ok(hotelBookings);
+    @DeleteMapping("/{hotelBookingId}")
+    public ResponseEntity<Void> deleteHotelBooking(@PathVariable Integer hotelBookingId) {
+        hotelBookingService.deleteHotelBooking(hotelBookingId);
+        return ResponseEntity.noContent().build();
     }
 
-    /**
-     * 取消酒店预订
-     */
-    @DeleteMapping("/booking/{bookingId}")
-    public ResponseEntity<?> cancelHotelBooking(@PathVariable Integer bookingId) {
-        try {
-            bookingService.cancelHotelBooking(bookingId);
-            return ResponseEntity.ok("Hotel booking canceled successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to cancel booking: " + e.getMessage());
-        }
-    }
 }
