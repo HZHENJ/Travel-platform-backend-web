@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @ClassName AttractionBooking
@@ -38,6 +39,9 @@ public class AttractionBooking {
 
     @Column(nullable = false)
     private LocalDate visitDate; // 参观日期
+
+    @Column(nullable = false)
+    private LocalDateTime visitTime; // 参观时间
 
     @Column(nullable = false, length = 50)
     private String ticketType; // 门票类型

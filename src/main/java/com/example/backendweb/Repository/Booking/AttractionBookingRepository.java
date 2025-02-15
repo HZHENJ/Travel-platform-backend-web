@@ -1,13 +1,13 @@
-package com.example.backendweb.Repository;
+package com.example.backendweb.Repository.Booking;
 
 import com.example.backendweb.Entity.Booking.AttractionBooking;
-import com.example.backendweb.Entity.Info.Attraction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface AttractionBookingRepository extends JpaRepository<AttractionBooking, Integer> {
@@ -23,6 +23,11 @@ public interface AttractionBookingRepository extends JpaRepository<AttractionBoo
             "GROUP BY a.attractionName " +
             "ORDER BY COUNT(ab) DESC")
     List<Object[]> getMostFrequentAttractions();
+
+    List<AttractionBooking> findByBookingIdIn(List<Integer> bookingIds);
+    int countByAttractionId(Integer attractionId);
+    // 通过 bookingId 查找 AttractionBooking
+    Optional<AttractionBooking> findByBookingId(Integer bookingId);
 
     @Query(value = """
             SELECT a.attraction_id as attractionId, 

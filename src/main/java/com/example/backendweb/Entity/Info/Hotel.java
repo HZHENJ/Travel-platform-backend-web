@@ -46,4 +46,7 @@ public class Hotel {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json", nullable = false)
     private Map<String, Integer> roomAvailability; // 各房型剩余数量
+
+    @Column(nullable = false, unique = true)
+    private String uuid; // 酒店唯一标识
 }

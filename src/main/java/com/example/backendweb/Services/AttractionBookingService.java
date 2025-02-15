@@ -1,7 +1,7 @@
 package com.example.backendweb.Services;
 
 import com.example.backendweb.Entity.Booking.AttractionBooking;
-import com.example.backendweb.Repository.AttractionBookingRepository;
+import com.example.backendweb.Repository.Booking.AttractionBookingRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

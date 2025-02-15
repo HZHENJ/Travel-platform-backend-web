@@ -36,6 +36,9 @@ public class Review {
     @Column(nullable = false)
     private Integer itemId; // Item ID (Flight ID, Hotel ID, or Attraction ID)
 
+    @Column(nullable = false)
+    private Integer bookingId; // 一个booking对应一条review
+
     @Column(nullable = false, precision = 2, scale = 1)
     private BigDecimal rating; // Rating
 

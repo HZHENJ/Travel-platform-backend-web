@@ -7,8 +7,7 @@ import com.example.backendweb.Entity.User.User;
 import com.example.backendweb.Repository.AttractionRepository;
 import com.example.backendweb.Repository.Review.ReviewRepository;
 import com.example.backendweb.Repository.Review.ReviewStatsRepository;
-import com.example.backendweb.Repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backendweb.Repository.User.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

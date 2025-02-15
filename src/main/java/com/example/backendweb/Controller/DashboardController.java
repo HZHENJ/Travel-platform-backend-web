@@ -1,6 +1,6 @@
 package com.example.backendweb.Controller;
 
-import com.example.backendweb.Repository.AttractionBookingRepository;
+import com.example.backendweb.Repository.Booking.AttractionBookingRepository;
 import com.example.backendweb.Repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.backendweb.Entity.Booking.Booking;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;

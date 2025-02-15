@@ -1,9 +1,9 @@
 package com.example.backendweb.Services;
 
 
-import com.example.backendweb.Repository.AuthenticationRepository;
-import com.example.backendweb.Repository.PreferenceRepository;
-import com.example.backendweb.Repository.UserRepository;
+import com.example.backendweb.Repository.User.AuthenticationRepository;
+import com.example.backendweb.Repository.User.PreferenceRepository;
+import com.example.backendweb.Repository.User.UserRepository;
 import com.example.backendweb.Entity.Exception.CustomException;
 import com.example.backendweb.Entity.User.Authentication;
 import com.example.backendweb.Entity.User.Preference;
