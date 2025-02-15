@@ -19,7 +19,7 @@ public class FlightBookingController {
     }
 
     @PostMapping("/booking")
-    public ResponseEntity<FlightBooking> createFlightBooking(FlightBookingRequest request) {
+    public ResponseEntity<FlightBooking> createFlightBooking(@RequestBody FlightBookingRequest request) {
         return ResponseEntity.ok(bookingService.createFlightBooking(request));
     }
 
