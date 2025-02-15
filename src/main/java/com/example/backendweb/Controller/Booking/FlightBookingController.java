@@ -4,14 +4,12 @@ import com.example.backendweb.DTO.Booking.FlightBookingRequest;
 import com.example.backendweb.Entity.Booking.FlightBooking;
 import com.example.backendweb.Services.BookingService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController(("/api/flights"))
+@RestController
+@RequestMapping("/api/flights")
 public class FlightBookingController {
 
     private final BookingService bookingService;

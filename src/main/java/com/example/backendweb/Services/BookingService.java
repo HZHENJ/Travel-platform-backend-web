@@ -332,7 +332,7 @@ public class BookingService {
         FlightBooking flightBooking = FlightBooking.builder()
                 .bookingId(booking.getBookingId())
                 .flightId(request.getId())
-                .seatClass(FlightBooking.SeatClass.valueOf(request.getSelectedSeats().toUpperCase()))
+                .seatClass(FlightBooking.SeatClass.valueOf(request.getSelectedSeats()))
                 .passengerId(request.getUserId().toString())
                 .passengerName(userRepository.findById(Math.toIntExact(request.getUserId())).get().getName())
                 .build();
