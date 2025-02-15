@@ -20,10 +20,15 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/recommendations")
+@RequestMapping("/api/recommendations")
 public class RecommendationController {
     @Autowired
     private RecommendationService recommendationService;
+
+    @GetMapping("/famous") // 新用户推荐著名景点
+    public List<Attraction> getFamousAttractions() {
+        return recommendationService.getFamousAttractions();
+    }
 
     @GetMapping("/popular") // Popular recommendations
     public List<Attraction> getPopularRecommendations() {

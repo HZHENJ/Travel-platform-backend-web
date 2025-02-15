@@ -1,32 +1,16 @@
-name: Spring Boot CI/CD Pipeline
+name: Deploy Backend to EC2 using Docker
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - deploy
 
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: travel_db
-          MYSQL_USER: user
-          MYSQL_PASSWORD: userpassword
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
 
     steps:
-      - name: Checkout repository
+      - name: Pull code
         uses: actions/checkout@v3
 
       - name: Set up JDK 17
@@ -35,67 +19,68 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Wait for MySQL
+      - name: Compile Spring Boot application
         run: |
-          echo "Waiting for MySQL to be ready..."
-          until mysqladmin ping -h 127.0.0.1 -uroot -prootpassword --silent; do
-            echo "Waiting for MySQL..."
-            sleep 2
-          done
-          echo "MySQL is ready!"
+          mvn clean package -DskipTests
+          ls -la target/
 
-      - name: Verify MySQL Connection
+      - name: Make sure the JAR file exists
+        run: test -f target/backend-web-0.0.1-SNAPSHOT.jar || exit 1
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build a Docker image
         run: |
-          mysql -h 127.0.0.1 -uroot -prootpassword -e "SHOW DATABASES;"
+          docker build -t hzhenj/backend-web .
+          docker tag hzhenj/backend-web:latest hzhenj/backend-web:latest
 
-      - name: Build & Test Spring Boot
-        run: |
-          cd backend-web
-          chmod +x mvnw
-          ./mvnw clean package -DskipTests
+      - name: Push the Docker image to Docker Hub
+        run: docker push hzhenj/backend-web:latest
 
-  docker:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: SSH to EC2 and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Make sure Docker is installed
+            if ! command -v docker &> /dev/null
+            then
+              echo "🚀 Docker is not installed, start installing..."
+              sudo apt update
+              sudo apt install docker.io -y
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            else
+              echo "✅ Docker is installed"
+            fi
 
-      - name: Login to Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_HUB_PASS }}" | docker login -u "${{ secrets.DOCKER_HUB_USER }}" --password-stdin
+            # Make sure the `ubuntu` user has Docker permissions
+            if ! groups | grep -q "docker"
+            then
+              echo "🔑 Granting Docker access to the ubuntu user..."
+              sudo usermod -aG docker $USER
+              newgrp docker
+            else
+              echo "✅ The ubuntu user already has Docker permissions"
+            fi
 
-      - name: Build & Tag Docker Images
-        run: |
-          docker-compose build
-          docker tag my-springboot-app ${{ secrets.DOCKER_HUB_USER }}/springboot-app:latest
-          docker tag my-frontend-app ${{ secrets.DOCKER_HUB_USER }}/frontend-app:latest
+            # Pull the latest Docker image
+            docker pull hzhenj/backend-web:latest
 
-      - name: Push Docker Images
-        run: |
-          docker push ${{ secrets.DOCKER_HUB_USER }}/springboot-app:latest
-          docker push ${{ secrets.DOCKER_HUB_USER }}/frontend-app:latest
+            # Forcefully delete existing `backend-web` container (whether running or not)
+            if [ "$(docker ps -aq -f name=backend-web)" ]; then
+              echo "🔴 Remove old backend-web container..."
+              docker stop backend-web || true
+              docker rm backend-web
+            else
+              echo "✅ There is no backend-web container to delete"
+            fi
 
-  deploy:
-    needs: docker
-    runs-on: ubuntu-latest
+            # Run new container
+            echo "🚀 Start new container..."
+            docker run -d --name backend-web -p 8080:8080 hzhenj/backend-web:latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      - name: Decode and save EC2 SSH private key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: SSH into EC2 and deploy Docker Compose
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-            cd ~/AD-Project
-            git pull https://github.com/${{ github.repository }}.git
-            docker-compose down
-            docker-compose pull
-            docker-compose up --build -d
-          EOF

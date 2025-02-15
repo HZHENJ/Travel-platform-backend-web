@@ -1,9 +1,12 @@
 package com.example.backendweb.Config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
 /**
  * @ClassName CorsConfig
@@ -17,6 +20,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig {
 
+    private final Logger logger = LoggerFactory.getLogger(CorsConfig.class);
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -24,17 +29,24 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 // 对所有路径生效
                 registry.addMapping("/**")
-                        // 允许所有来源，如果你只允许特定域名，请替换为对应域名，例如 "http://example.com"
-                        .allowedOrigins("http://localhost:5173")
-                        // 允许的请求方法
+                        .allowedOrigins(getAllowedOrigins())
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        // 允许的请求头
                         .allowedHeaders("*")
-                        // 是否允许发送 Cookie 等凭证信息，若允许则设置为 true
-                        .allowCredentials(true)
-                        // 预检请求的缓存时间（秒）
+                        .allowCredentials(false)
                         .maxAge(3600);
             }
         };
+    }
+
+    private String[] getAllowedOrigins() {
+        String allowedOrigins = System.getenv("ALLOWED_ORIGINS"); // 读取环境变量
+        if (allowedOrigins == null || allowedOrigins.isEmpty()) {
+            return new String[]{
+                    "http://localhost:5173",
+                    "http://54.251.31.38:8081",
+                    "http://54.251.31.38",
+            };
+        }
+        return allowedOrigins.split(",");
     }
 }

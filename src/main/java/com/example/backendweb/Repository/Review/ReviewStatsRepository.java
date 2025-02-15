@@ -2,8 +2,8 @@ package com.example.backendweb.Repository.Review;
 
 import com.example.backendweb.Entity.Review.ReviewStats;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @ClassName ReviewStatsRepository
@@ -14,5 +14,7 @@ import java.util.List;
  * @Version 1.0
  */
 public interface ReviewStatsRepository extends JpaRepository<ReviewStats, Integer> {
+    Optional<ReviewStats> findByItemTypeAndItemId(ReviewStats.ItemType itemType, Integer itemId);
+    Optional<ReviewStats> findByItemIdAndItemType(Integer itemId, ReviewStats.ItemType itemType);
     List<ReviewStats> findByItemTypeOrderByAverageRatingDesc(ReviewStats.ItemType itemType);
 }

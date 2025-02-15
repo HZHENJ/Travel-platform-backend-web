@@ -26,20 +26,40 @@ import java.util.stream.Collectors;
 @Service
 public class RecommendationService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
 
-    @Autowired
-    private AttractionRepository attractionRepository;
+    private final AttractionRepository attractionRepository;
 
-    @Autowired
-    private ReviewStatsRepository reviewStatsRepository;
+    private final ReviewStatsRepository reviewStatsRepository;
 
-    @Autowired
-    private SimilarityService similarityService;
+    private final SimilarityService similarityService;
+
+    public RecommendationService(
+        UserRepository userRepository,
+        ReviewRepository reviewRepository,
+        AttractionRepository attractionRepository,
+        ReviewStatsRepository reviewStatsRepository,
+        SimilarityService similarityService
+    ) {
+        this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
+        this.attractionRepository = attractionRepository;
+        this.reviewStatsRepository = reviewStatsRepository;
+        this.similarityService = similarityService;
+    }
+
+    // 获取评分最高的 10 个著名景点
+    public List<Attraction> getFamousAttractions() {
+        List<ReviewStats> topAttractions = reviewStatsRepository.findByItemTypeOrderByAverageRatingDesc(ReviewStats.ItemType.Attraction);
+
+        return topAttractions.stream()
+                .limit(3) // 取前 10 个
+                .map(stat -> attractionRepository.findById(stat.getItemId()).orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
     /**
     * Get popular attractions (based on average ratings)
@@ -47,7 +67,7 @@ public class RecommendationService {
     public List<Attraction> getPopularAttractions() {
         List<ReviewStats> topAttractions = reviewStatsRepository.findByItemTypeOrderByAverageRatingDesc(ReviewStats.ItemType.Attraction);
         return topAttractions.stream()
-                .limit(10) // Take the top 10 popular attractions
+                .limit(3) // Take the top 10 popular attractions
                 .map(stat -> attractionRepository.findById(stat.getItemId()).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
