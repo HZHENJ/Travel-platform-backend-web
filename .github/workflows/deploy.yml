@@ -82,5 +82,3 @@ jobs:
             # Run new container
             echo "🚀 Start new container..."
             docker run -d --name backend-web -p 8080:8080 hzhenj/backend-web:latest
-
-
