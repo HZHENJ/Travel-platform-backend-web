@@ -52,7 +52,7 @@ public class UserController {
                 .build();
 
         Authentication auth = Authentication.builder()
-                .username(request.getEmail())
+                .username("user-"+user.getUserId())
                 .passwordHash(request.getPassword())
                 .role(Authentication.Role.User)
                 .build();
