@@ -43,8 +43,8 @@ public class CorsConfig {
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             return new String[]{
                     "http://localhost:5173",
-                    "http://18.138.251.86:8081",
-                    "http://18.138.251.86",
+                    "http://18.136.204.220:8081",
+                    "http://18.136.204.220",
             };
         }
         return allowedOrigins.split(",");
