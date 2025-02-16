@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class AttractionService {
 
     private final AttractionRepository attractionRepository;
-    private ReviewStatsRepository reviewStatsRepository;
+    private final ReviewStatsRepository reviewStatsRepository;
     private final ReviewRepository reviewRepository;
 
     public AttractionService(
@@ -133,5 +133,16 @@ public class AttractionService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    public BigDecimal getRatingByUuid(String uuid) {
+        // Step 1: 根据 UUID 查询景点
+        Attraction attraction = attractionRepository.findByUuid(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("Attraction not found for UUID: " + uuid));
+
+        // Step 2: 查询与该景点相关的评分
+        return reviewStatsRepository.findByItemIdAndItemType(attraction.getAttractionId(), ReviewStats.ItemType.Attraction)
+                .map(ReviewStats::getAverageRating)
+                .orElse(BigDecimal.valueOf(0.0));
     }
 }

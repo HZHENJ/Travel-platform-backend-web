@@ -70,4 +70,19 @@ public class HotelService {
         return Optional.of(Map.of("totalReviews", 0, "averageRating", BigDecimal.ZERO));
     }
 
+
+    public BigDecimal getRatingByUuid(String uuid) {
+        // 根据uuid查询景点
+        Hotel hotel = hotelRepository.findByUuid(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("Hotel not found for UUID: " + uuid));
+
+        // 查询与该景点相关的评分
+        Optional<ReviewStats> reviewStats = reviewStatsRepository.findByItemIdAndItemType( hotel.getHotelId(), ReviewStats.ItemType.Hotel);
+
+        if (reviewStats.isPresent()) {
+            return reviewStats.get().getAverageRating();
+        } else {
+            return BigDecimal.ZERO;
+        }
+    }
 }

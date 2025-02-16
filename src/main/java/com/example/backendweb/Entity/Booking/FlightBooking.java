@@ -33,10 +33,10 @@ public class FlightBooking {
     @Column(nullable = false)
     private SeatClass seatClass; // 座位等级
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     private String passengerName; // 乘客姓名
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = true, length = 50)
     private String passengerId; // 乘客证件号
 
     public enum SeatClass {
