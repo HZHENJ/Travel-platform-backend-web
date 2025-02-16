@@ -55,7 +55,7 @@ public class RecommendationService {
         List<ReviewStats> topAttractions = reviewStatsRepository.findByItemTypeOrderByAverageRatingDesc(ReviewStats.ItemType.Attraction);
 
         return topAttractions.stream()
-                .limit(3) // 取前 10 个
+                .limit(10) // 取前 10 个
                 .map(stat -> attractionRepository.findById(stat.getItemId()).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -67,7 +67,7 @@ public class RecommendationService {
     public List<Attraction> getPopularAttractions() {
         List<ReviewStats> topAttractions = reviewStatsRepository.findByItemTypeOrderByAverageRatingDesc(ReviewStats.ItemType.Attraction);
         return topAttractions.stream()
-                .limit(3) // Take the top 10 popular attractions
+                .limit(10) // Take the top 10 popular attractions
                 .map(stat -> attractionRepository.findById(stat.getItemId()).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
