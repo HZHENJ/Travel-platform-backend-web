@@ -38,13 +38,13 @@ public class MediaProxyController {
     ) throws IOException {
         ResponseEntity<byte[]> externalResponse = mediaService.getMediaFile(uuid, fileType);
         if (externalResponse.getStatusCode().is2xxSuccessful() && externalResponse.getBody() != null) {
-            // 设置响应的 Content-Type（例如 image/jpg）
+            // Set the Content-Type of the response (e.g. image/jpg)
             MediaType contentType = externalResponse.getHeaders().getContentType();
             response.setContentType(contentType != null ? contentType.toString() : "application/octet-stream");
-            // 将获取到的图片二进制数据写入响应输出流
+            // Write the acquired image binary data to the response output stream
             StreamUtils.copy(externalResponse.getBody(), response.getOutputStream());
         } else {
-            // 当请求失败时返回错误状态码
+            // Returns an error status code when the request fails
             response.sendError(externalResponse.getStatusCodeValue(), "Can not get Media File!");
         }
     }

@@ -24,23 +24,23 @@ import java.time.LocalDateTime;
 public class AttractionBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer attractionBookingId; // 景点预订唯一标识 (Primary Key)
+    private Integer attractionBookingId; // Primary Key for Attraction Reservations
 
     @Column(nullable = true)
-    private Integer bookingId; // 预订ID (外键)
+    private Integer bookingId; // Booking ID (foreign key)
 
     @Column(nullable = false)
-    private Integer attractionId; // 景点ID (外键)
+    private Integer attractionId; // Attraction ID (foreign key)
 
     @Column(nullable = false)
-    private LocalDate visitDate; // 参观日期
+    private LocalDate visitDate; // Date of visit
 
     @Column(nullable = false)
-    private LocalDateTime visitTime; // 参观时间
+    private LocalDateTime visitTime; // Visiting time
 
     @Column(length = 50)
-    private String ticketType; // 门票类型
+    private String ticketType; // Ticket type
 
     @Column(nullable = false)
-    private Integer numberOfTickets; // 门票数量
+    private Integer numberOfTickets; // Number of tickets
 }

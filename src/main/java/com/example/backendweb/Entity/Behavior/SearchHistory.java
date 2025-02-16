@@ -25,27 +25,27 @@ import java.time.LocalDateTime;
 public class SearchHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer searchId; // 搜索记录唯一标识 (Primary Key)
+    private Integer searchId; // Primary Key
 
     @Column(nullable = false)
-    private Integer userId; // 用户ID (外键)
+    private Integer userId; // User ID (foreign key)
 
     @Column(nullable = false, length = 255)
-    private String keywords; // 用户输入的搜索关键词
+    private String keywords; // Search terms entered by the user
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SearchType searchType; // 搜索类型 (Hotel 或 Attraction)
+    private SearchType searchType; // Search Type (Hotel or Attraction)
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json", nullable = true)
-    private String filters; // 搜索条件 (JSON 格式)
+    private String filters; // Search criteria (JSON format)
 
     @Column(nullable = false)
-    private Integer resultsCount; // 搜索结果数量
+    private Integer resultsCount; // Search criteria (JSON format)
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt; // 搜索时间
+    private LocalDateTime createdAt; // Number of search results
 
     public enum SearchType {
         Hotel, Attraction

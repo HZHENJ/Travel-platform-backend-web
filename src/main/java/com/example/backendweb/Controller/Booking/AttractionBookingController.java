@@ -28,17 +28,17 @@ public class AttractionBookingController {
     }
 
     /**
-     * 处理创建景点预订的请求
-     * @param request 前端传来的预订信息
-     * @return 预订详情
+     * Processing requests to create attraction reservations
+     * @param request Booking information coming from the front end
+     * @return Booking Details
      */
     @PostMapping("/booking")
     public ResponseEntity<?> createAttractionBooking(@RequestBody AttractionBookingRequest request) {
         try {
             AttractionBooking booking = bookingService.createAttractionBooking(request);
-            return ResponseEntity.ok(booking); // 200 OK，返回创建的预订信息
+            return ResponseEntity.ok(booking); // 200 OK，Returns the created reservation information
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage()); // 400 错误
+            return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage()); // 400 incorrect
         }
     }
 
@@ -46,7 +46,7 @@ public class AttractionBookingController {
     public ResponseEntity<List<AttractionBookingDTO>> getAttractionBookingsByUser(@PathVariable Integer userId) {
         List<AttractionBookingDTO> attractionBookings = bookingService.getAttractionBookingsByUserId(userId);
 
-        // 如果没有找到任何 booking，返回 HTTP 204 No Content
+        // If no booking is found, returns HTTP 204 No Content
         if (attractionBookings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -55,7 +55,7 @@ public class AttractionBookingController {
     }
 
     /**
-     * 取消景点预订
+     * Cancel Attraction Reservations
      */
     @DeleteMapping("/booking/{bookingId}")
     public ResponseEntity<?> cancelAttractionBooking(@PathVariable Integer bookingId) {

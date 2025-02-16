@@ -25,7 +25,7 @@ public class RecommendationController {
     @Autowired
     private RecommendationService recommendationService;
 
-    @GetMapping("/famous") // 新用户推荐著名景点
+    @GetMapping("/famous") // Recommended Famous Attractions for New Users
     public List<Attraction> getFamousAttractions() {
         return recommendationService.getFamousAttractions();
     }

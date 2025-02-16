@@ -30,7 +30,7 @@ public class HotelBookingController {
     }
 
     /**
-     * 处理创建酒店预订的请求
+     * Processing requests to create hotel reservations
      */
     @PostMapping("/booking")
     public ResponseEntity<?> createHotelBooking(@RequestBody HotelBookingRequest request) {
@@ -46,7 +46,7 @@ public class HotelBookingController {
     public ResponseEntity<List<HotelBookingDTO>> getHotelBookingsByUser(@PathVariable Integer userId) {
         List<HotelBookingDTO> hotelBookings = bookingService.getHotelBookingsByUserId(userId);
 
-        // 如果没有找到任何 Hotel Booking，返回 HTTP 204 No Content
+        // If no Hotel Booking is found, returns HTTP 204 No Content
         if (hotelBookings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -55,7 +55,7 @@ public class HotelBookingController {
     }
 
     /**
-     * 取消酒店预订
+     * Cancel Hotel Reservation
      */
     @DeleteMapping("/booking/{bookingId}")
     public ResponseEntity<?> cancelHotelBooking(@PathVariable Integer bookingId) {

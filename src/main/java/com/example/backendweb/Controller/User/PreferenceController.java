@@ -25,7 +25,7 @@ public class PreferenceController {
     }
 
     /**
-     * 获取用户偏好
+     * Capturing user preferences
      */
     @GetMapping("/{userId}")
     public ResponseEntity<Preference> getUserPreference(@PathVariable Integer userId) {
@@ -38,7 +38,7 @@ public class PreferenceController {
     }
 
     /**
-     * 更新用户偏好
+     * Updating user preferences
      */
     @PutMapping("/{userId}")
     public ResponseEntity<Preference> updateUserPreference(

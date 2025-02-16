@@ -27,7 +27,7 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                // 对所有路径生效
+                // Effective for all paths
                 registry.addMapping("/**")
                         .allowedOrigins(getAllowedOrigins())
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
@@ -39,7 +39,7 @@ public class CorsConfig {
     }
 
     private String[] getAllowedOrigins() {
-        String allowedOrigins = System.getenv("ALLOWED_ORIGINS"); // 读取环境变量
+        String allowedOrigins = System.getenv("ALLOWED_ORIGINS"); // Reading environment variables
         if (allowedOrigins == null || allowedOrigins.isEmpty()) {
             return new String[]{
                     "http://localhost:5173",

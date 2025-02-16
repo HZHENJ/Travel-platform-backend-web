@@ -42,7 +42,7 @@ public class UserController {
     }
 
     /**
-     * 用户注册（支持带或不带 `Preference`）
+     * User registration (with or without `Preference` support)
      */
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationRequest request) {
@@ -71,10 +71,10 @@ public class UserController {
     public ResponseEntity<LoginResponse> loginUser(@RequestBody UserLoginRequest request) {
         User user = userService.login(request.getEmail(), request.getPassword());
 
-        // 通过 `UserService` 获取 `Authentication` 记录
+        // Get the `Authentication` record via `UserService`.
         Authentication auth = userService.getUserAuthentication(user);
 
-        // 生成 JWT 令牌
+        // Generate JWT tokens
         String token = jwtUtil.generateToken(user.getUserId(), auth.getRole());
 
         return ResponseEntity.ok(
@@ -87,7 +87,7 @@ public class UserController {
                 ));
     }
 
-    // 获取用户信息
+    // Get user information
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserProfile(@PathVariable Integer userId) {
         Optional<User> user = userService.getUserById(userId);

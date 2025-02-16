@@ -23,23 +23,23 @@ import java.time.LocalDateTime;
 public class UserBehavior {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer behaviorId; // 行为记录唯一标识 (Primary Key)
+    private Integer behaviorId; // Primary Key for behavioral records
 
     @Column(nullable = false)
-    private Integer userId; // 用户ID (外键)
+    private Integer userId; // User ID (foreign key)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ActionType actionType; // 行为类型 (Click, View, Book, Search)
+    private ActionType actionType; // Type of behavior (Click, View, Book, Search)
 
     @Column(nullable = false)
-    private Integer actionTarget; // 行为目标ID (如推荐内容)
+    private Integer actionTarget; // Behavioral Target ID (e.g. Recommended Content)
 
     @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime actionTime; // 行为发生时间
+    private LocalDateTime actionTime; // Behavioral Target ID (e.g. Recommended Content)
 
     @Column(nullable = true)
-    private Integer duration; // 用户停留时间 (单位：秒)
+    private Integer duration; // User Dwell Time (in seconds)
 
     public enum ActionType {
         Click, View, Book, Search

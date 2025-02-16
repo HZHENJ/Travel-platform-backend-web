@@ -27,7 +27,7 @@ public class FlightBookingController {
     public ResponseEntity<List<FlightBooking>> getFlightBookingsByUser(@PathVariable Integer userId) {
         List<FlightBooking> flightBookings = bookingService.getFlightBookingsByUserId(userId);
 
-        // 如果没有找到任何 booking，返回 HTTP 204 No Content
+        // If no booking is found, returns HTTP 204 No Content
         if (flightBookings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

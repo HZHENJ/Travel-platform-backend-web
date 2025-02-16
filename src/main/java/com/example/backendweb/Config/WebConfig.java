@@ -24,8 +24,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
-                // .addPathPatterns("/api/**") // 拦截所有 /api/ 下的请求
-                // .excludePathPatterns("/proxy/media/**", "/api/auth/register", "/api/auth/login"); // 开放的 API
+                // .addPathPatterns("/api/**") // Intercept all requests under /api/.
+                // .excludePathPatterns("/proxy/media/**", "/api/auth/register", "/api/auth/login"); // Open API
                 .excludePathPatterns("/**");
     }
 }

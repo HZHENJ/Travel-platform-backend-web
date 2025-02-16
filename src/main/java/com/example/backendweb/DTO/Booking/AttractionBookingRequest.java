@@ -21,10 +21,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttractionBookingRequest {
-    private Integer userId;             // 用户ID
-    private String uuid;                // 景点UUID
-    private LocalDate visitDate;        // 参观日期
-    private LocalDateTime visitTime;    // 参观时间
-    private Integer numberOfTickets;    // 预订门票数量
-    private Double price;               // 价格
+    private Integer userId;             // user ID
+    private String uuid;                // Attractions UUID
+    private LocalDate visitDate;        // Date of visit
+    private LocalDateTime visitTime;    // Visiting time
+    private Integer numberOfTickets;    // Visiting time
+    private Double price;               // prices
 }
